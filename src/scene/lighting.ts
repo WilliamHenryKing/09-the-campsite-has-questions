@@ -17,8 +17,8 @@ const LOOKS: Record<
     sky: 0xf1d9ab,
     key: 0xffe2b5,
     keyI: 3.2,
-    keyPos: [2, 10, 8],
-    hemi: [0xd6e6ff, 0x7c8f55, 1.15],
+    keyPos: [-1, 9, -7],
+    hemi: [0xd6e6ff, 0x7c8f55, 1.45],
   },
   rain: {
     sky: 0x8d99a7,

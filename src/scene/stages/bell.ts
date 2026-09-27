@@ -47,9 +47,9 @@ function common(w: World) {
 
 export const bellStage: Stage = {
   anchors: {
-    knots: v(END.x + 1.05, 0.75, END.z),
+    knots: v(END.x + 1.05, 0.45, END.z + 0.5),
     grooves: v(END.x - 0.6, 0.25, END.z + 0.75),
-    cord: v(3.2, 1.2, 0.6),
+    cord: v(3.2, 2.55, 0.6),
   },
 
   found(w) {

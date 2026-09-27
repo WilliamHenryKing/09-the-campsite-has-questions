@@ -21,6 +21,8 @@ export interface Anchor {
 const STAGES: Record<string, Stage> = { picnic: picnicStage, tent: tentStage, bell: bellStage };
 const TARGET = new THREE.Vector3(0, 0.4, 0);
 const tmp = new THREE.Vector3();
+const tmp2 = new THREE.Vector3();
+const box = new THREE.Box3();
 
 /** Owns the renderer, camera and loop; the UI talks to it through a handful of verbs. */
 export class CampScene {
@@ -231,8 +233,9 @@ export class CampScene {
     };
     for (const [id, p] of Object.entries(this.stage.anchors)) push(id, p);
     for (const [id, c] of Object.entries(this.world.cast) as [CharacterId, Character][]) {
-      c.root.updateMatrixWorld();
-      push(id, c.root.localToWorld(new THREE.Vector3(0, c.headTop, 0)));
+      // The top of the silhouette, so the tag sits right whether a camper stands or lies down.
+      box.setFromObject(c.root);
+      push(id, box.getCenter(tmp2).setY(box.max.y + 0.1));
     }
     for (const l of this.listeners) l(out);
   }

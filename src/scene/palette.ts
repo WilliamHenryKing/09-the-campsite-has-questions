@@ -4,7 +4,7 @@ import * as THREE from "three";
 export const C = {
   grass: 0x9dbb6e,
   grassWet: 0x6f8f5a,
-  grassDew: 0xc9d6c6,
+  grassDew: 0xb8cfb6,
   earth: 0x8a6a4a,
   path: 0xd8c39a,
   wood: 0xb7865a,
