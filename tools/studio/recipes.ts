@@ -114,8 +114,8 @@ export const families: Recipes["families"] = [
   { id: "cooler", count: 8, voxel: 0.006, keep: 0.3, build: cooler },
   { id: "camp-lantern", count: 8, voxel: 0.003, keep: 0.3, build: lantern },
   { id: "fire-ring", count: 8, voxel: 0.008, keep: 0.25, build: fireRing },
-  { id: "evidence", count: 36, voxel: 0.002, keep: 0.3, build: evidence },
-  { id: "camp-sign", count: 10, voxel: 0.008, keep: 0.3, build: sign },
+  { id: "evidence", count: 72, voxel: 0.002, keep: 0.3, build: evidence },
+  { id: "camp-sign", count: 20, voxel: 0.008, keep: 0.3, build: sign },
 ];
 export const textures: Recipes["textures"] = [
   { id: "tent-nylon", ramp: [0xa87a2a, 0xd9a441, 0xe6b85a], layers: [{ kind: "weave", count: 128, weight: 0.4 }, { kind: "fbm", scale: 6, weight: 0.6 }], roughness: [0.5, 0.7], normal: 0.8 },
