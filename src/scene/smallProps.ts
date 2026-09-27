@@ -85,15 +85,15 @@ export function revealTrail(g: THREE.Group, fraction: number) {
   });
 }
 
-export function drip(): THREE.Mesh {
-  const d = new THREE.Mesh(
-    new THREE.CircleGeometry(0.06, 8),
-    new THREE.MeshStandardMaterial({ color: C.lemonade, roughness: 0.15 }),
-  );
+const dripMat = new THREE.MeshStandardMaterial({ color: C.lemonade, roughness: 0.15 });
+
+/** A flat splash, wrapped in a group so trails can turn it without tipping it on edge. */
+export function drip(): THREE.Group {
+  const d = new THREE.Mesh(new THREE.CircleGeometry(0.075, 9), dripMat);
   d.rotation.x = -Math.PI / 2;
-  d.position.y = 0.025;
+  d.position.y = 0.03;
   d.receiveShadow = true;
-  return d;
+  return group(d);
 }
 
 /** A pair of drag grooves, one short segment per mark. */

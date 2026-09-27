@@ -23,7 +23,7 @@ function corner(i: number) {
 
 function build(w: World) {
   const dry = flatPatch(1.9, 1.9, C.grass);
-  dry.position.set(PITCH.x, 0.006, PITCH.z);
+  dry.position.set(PITCH.x, 0.015, PITCH.z);
   dry.rotation.z = PITCH_RY;
   const r = rain();
   const p = puddle();

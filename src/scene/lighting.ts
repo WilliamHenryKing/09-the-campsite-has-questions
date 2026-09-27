@@ -56,11 +56,22 @@ export class Lighting {
     scene.add(this.key, this.key.target, this.hemi);
   }
 
+  private fogFrom = 30;
+
+  /** Keep the haze behind the island however far the camera pulls back for narrow screens. */
+  fitFog(scene: THREE.Scene, radius: number) {
+    this.fogFrom = radius + 8;
+    if (scene.fog instanceof THREE.Fog) {
+      scene.fog.near = this.fogFrom;
+      scene.fog.far = this.fogFrom + 40;
+    }
+  }
+
   apply(scene: THREE.Scene, time: CaseDef["time"]) {
     const l = LOOKS[time];
     const sky = new THREE.Color(l.sky);
     scene.background = sky;
-    scene.fog = new THREE.Fog(sky, 30, 70);
+    scene.fog = new THREE.Fog(sky, this.fogFrom, this.fogFrom + 40);
     this.key.color.setHex(l.key);
     this.key.intensity = l.keyI;
     this.key.position.set(...l.keyPos);

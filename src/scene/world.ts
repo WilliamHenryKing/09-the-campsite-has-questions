@@ -69,7 +69,7 @@ export class World {
     this.fire.position.set(-1.4, 0, 2.9);
     this.sunClock.position.set(-0.6, 0, -3.0);
     this.windsock.position.set(5.6, 0, 1.2);
-    const path = mesh(new THREE.CircleGeometry(1.5, 20), mat(C.path), 0.8, 0.004, 0.6);
+    const path = mesh(new THREE.CircleGeometry(1.5, 20), mat(C.path), 0.8, 0.01, 0.6);
     path.rotation.x = -Math.PI / 2;
     path.scale.set(1.5, 1, 1);
     path.castShadow = false;

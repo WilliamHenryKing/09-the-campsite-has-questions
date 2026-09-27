@@ -28,7 +28,7 @@ const box = new THREE.Box3();
 export class CampScene {
   private renderer: THREE.WebGLRenderer | null = null;
   private scene = new THREE.Scene();
-  private camera = new THREE.PerspectiveCamera(38, 1, 0.1, 120);
+  private camera = new THREE.PerspectiveCamera(38, 1, 0.5, 120);
   private lighting = new Lighting(this.scene);
   private world = new World();
   private inspector = new Inspector();
@@ -37,7 +37,7 @@ export class CampScene {
   private yaw = 0;
   private pitch = 0.78;
   private radius = 17;
-  private clock = new THREE.Clock();
+  private timer = new THREE.Timer();
   private frame = 0;
   private running: gsap.core.Timeline | null = null;
   private listeners: ((a: Anchor[]) => void)[] = [];
@@ -56,7 +56,7 @@ export class CampScene {
       this.renderer.toneMapping = THREE.AgXToneMapping;
       this.renderer.toneMappingExposure = 1.1;
       this.renderer.shadowMap.enabled = true;
-      this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      this.renderer.shadowMap.type = THREE.PCFShadowMap;
     } catch {
       this.renderer = null;
     }
@@ -142,6 +142,7 @@ export class CampScene {
     // Keep about twelve units of camp across the frame, however narrow the screen.
     const halfFov = Math.atan(Math.tan(THREE.MathUtils.degToRad(19)) * aspect);
     this.radius = Math.max(16.5, 6.2 / Math.tan(halfFov));
+    this.lighting.fitFog(this.scene, this.radius);
     this.inspector.resize(aspect);
     this.renderer?.setSize(this.width, this.height, false);
   }
@@ -179,8 +180,9 @@ export class CampScene {
 
   private loop = () => {
     this.frame = requestAnimationFrame(this.loop);
-    const dt = Math.min(this.clock.getDelta(), 0.05);
-    const t = this.clock.elapsedTime;
+    this.timer.update();
+    const dt = Math.min(this.timer.getDelta(), 0.05);
+    const t = this.timer.getElapsed();
     this.placeCamera();
     for (const c of this.world.extras.children) c.userData.update?.(dt);
     if (!this.reducedMotion) this.idle(t);

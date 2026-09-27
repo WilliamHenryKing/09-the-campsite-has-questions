@@ -755,17 +755,24 @@ body {
     font-size: 13px;
   }
 
+  /* Compact tags on phones: the mark alone, with the name kept for screen readers. */
   .tag-label {
-    font-size: 12px;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .tag {
-    min-height: 32px;
+    min-height: 0;
+    padding: 3px;
   }
 
   .tag-mark {
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
   }
 
   .fact {

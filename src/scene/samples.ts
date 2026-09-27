@@ -40,8 +40,8 @@ const SAMPLES: Record<string, () => THREE.Group> = {
   drips: () => {
     const g = turf();
     g.add(trail([v(-1.05, 0, 0.1), v(1.05, 0, -0.1)], 0.16, groovePair(0.5)).group);
-    const d = trail([v(-0.2, 0, 1), v(0.1, 0, 0), v(0.4, 0, -1)], 0.18, drip).group;
-    for (const c of d.children) c.position.y = 0.04;
+    const d = trail([v(-0.2, 0, 1), v(0.1, 0, 0), v(0.4, 0, -1)], 0.3, drip).group;
+    for (const c of d.children) c.scale.setScalar(1.3);
     d.scale.set(1.3, 1, 1);
     const j = jug();
     j.position.set(0.8, 0, 0.7);

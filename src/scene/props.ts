@@ -14,11 +14,12 @@ export function island(ground: THREE.MeshStandardMaterial): THREE.Group {
     pos.setZ(i, z * wobble);
   }
   shape.computeVertexNormals();
-  const earth = mesh(shape, mat(C.earth, { flat: true }), 0, -0.6, 0);
+  // Sunk a little below the grass disc so the two never fight for the same depth.
+  const earth = mesh(shape, mat(C.earth, { flat: true }), 0, -0.625, 0);
   const top = mesh(new THREE.CircleGeometry(7.45, 40), ground, 0, 0.001, 0);
   top.rotation.x = -Math.PI / 2;
   top.castShadow = false;
-  const lake = mesh(new THREE.CircleGeometry(1, 32), mat(C.water, { rough: 0.25 }), 4.4, 0.01, 3.7);
+  const lake = mesh(new THREE.CircleGeometry(1, 32), mat(C.water, { rough: 0.25 }), 4.4, 0.02, 3.7);
   lake.rotation.x = -Math.PI / 2;
   lake.scale.set(2.2, 1.4, 1);
   lake.castShadow = false;
