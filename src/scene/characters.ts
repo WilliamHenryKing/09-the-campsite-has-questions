@@ -19,8 +19,12 @@ const LOOKS: Record<CharacterId, Look> = {
     height: 1.35,
     girth: 0.27,
     hat: (g, top) => {
-      g.add(mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.03, 16), mat(0xb68a4e), 0, top + 0.02, 0));
-      g.add(mesh(new THREE.ConeGeometry(0.18, 0.2, 4), mat(0xb68a4e, { flat: true }), 0, top + 0.12, 0));
+      g.add(
+        mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.03, 16), mat(0xb68a4e), 0, top + 0.02, 0),
+      );
+      g.add(
+        mesh(new THREE.ConeGeometry(0.18, 0.2, 4), mat(0xb68a4e, { flat: true }), 0, top + 0.12, 0),
+      );
       g.add(mesh(new THREE.BoxGeometry(0.2, 0.05, 0.05), mat(0x5e4630), 0, top - 0.2, 0.2));
     },
   },
@@ -31,7 +35,15 @@ const LOOKS: Record<CharacterId, Look> = {
     girth: 0.32,
     hat: (g, top) => {
       g.add(mesh(new THREE.CylinderGeometry(0.4, 0.42, 0.03, 18), mat(0xf0d98a), 0, top, 0));
-      g.add(mesh(new THREE.SphereGeometry(0.2, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2), mat(0xf0d98a), 0, top, 0));
+      g.add(
+        mesh(
+          new THREE.SphereGeometry(0.2, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2),
+          mat(0xf0d98a),
+          0,
+          top,
+          0,
+        ),
+      );
       g.add(mesh(new THREE.TorusGeometry(0.2, 0.025, 5, 16), mat(C.check), 0, top + 0.03, 0));
     },
   },
@@ -41,7 +53,15 @@ const LOOKS: Record<CharacterId, Look> = {
     height: 0.85,
     girth: 0.21,
     hat: (g, top) => {
-      g.add(mesh(new THREE.SphereGeometry(0.19, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2), mat(C.sock), 0, top - 0.05, 0));
+      g.add(
+        mesh(
+          new THREE.SphereGeometry(0.19, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2),
+          mat(C.sock),
+          0,
+          top - 0.05,
+          0,
+        ),
+      );
       const brim = mesh(new THREE.BoxGeometry(0.2, 0.02, 0.18), mat(C.sock), 0, top - 0.05, 0.2);
       g.add(brim);
     },
@@ -60,14 +80,26 @@ export function character(id: CharacterId): Character {
   const look = LOOKS[id];
   const body = new THREE.Group();
   const h = look.height;
-  const torso = mesh(new THREE.CapsuleGeometry(look.girth, h * 0.45, 4, 10), mat(look.body), 0, h * 0.42, 0);
+  const torso = mesh(
+    new THREE.CapsuleGeometry(look.girth, h * 0.45, 4, 10),
+    mat(look.body),
+    0,
+    h * 0.42,
+    0,
+  );
   const headR = 0.2 + look.girth * 0.25;
   const headY = h * 0.42 + h * 0.22 + look.girth + headR * 0.7;
   const head = mesh(new THREE.SphereGeometry(headR, 16, 12), mat(look.skin), 0, headY, 0);
   body.add(torso, head);
   const eyes: THREE.Mesh[] = [];
   for (const s of [-1, 1]) {
-    const eye = mesh(new THREE.SphereGeometry(0.035, 8, 6), mat(C.ink), s * headR * 0.38, headY + 0.03, headR * 0.9);
+    const eye = mesh(
+      new THREE.SphereGeometry(0.035, 8, 6),
+      mat(C.ink),
+      s * headR * 0.38,
+      headY + 0.03,
+      headR * 0.9,
+    );
     eyes.push(eye);
     body.add(eye);
   }
@@ -93,7 +125,15 @@ export function raccoon(): THREE.Group {
   const mask = mesh(new THREE.BoxGeometry(0.3, 0.07, 0.1), mat(C.ink), 0, 0.41, 0.48);
   const tail = new THREE.Group();
   for (let i = 0; i < 4; i++) {
-    tail.add(mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.12, 8), mat(i % 2 ? C.ink : 0xb5b3b8), 0, 0, -i * 0.12));
+    tail.add(
+      mesh(
+        new THREE.CylinderGeometry(0.07, 0.07, 0.12, 8),
+        mat(i % 2 ? C.ink : 0xb5b3b8),
+        0,
+        0,
+        -i * 0.12,
+      ),
+    );
     (tail.children[i] as THREE.Mesh).rotation.x = Math.PI / 2;
   }
   tail.position.set(0, 0.35, -0.42);
@@ -108,6 +148,7 @@ export function bear(): THREE.Group {
   const head = mesh(new THREE.SphereGeometry(0.34, 10, 8), brown, 0, 0.95, 0.75);
   const snout = mesh(new THREE.SphereGeometry(0.14, 8, 6), mat(0xc49a72), 0, 0.88, 1.05);
   const g = group(body, head, snout);
-  for (const s of [-1, 1]) g.add(mesh(new THREE.SphereGeometry(0.1, 8, 6), brown, s * 0.22, 1.25, 0.72));
+  for (const s of [-1, 1])
+    g.add(mesh(new THREE.SphereGeometry(0.1, 8, 6), brown, s * 0.22, 1.25, 0.72));
   return g;
 }

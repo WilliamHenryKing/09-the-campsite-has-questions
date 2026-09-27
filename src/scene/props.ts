@@ -26,7 +26,13 @@ export function island(ground: THREE.MeshStandardMaterial): THREE.Group {
   const stones = new THREE.DodecahedronGeometry(0.22, 0);
   for (let i = 0; i < 9; i++) {
     const a = (i / 9) * Math.PI * 2 + 0.3;
-    const s = mesh(stones, mat(C.stone, { flat: true }), 4.4 + Math.cos(a) * 2.3, 0.05, 3.7 + Math.sin(a) * 1.5);
+    const s = mesh(
+      stones,
+      mat(C.stone, { flat: true }),
+      4.4 + Math.cos(a) * 2.3,
+      0.05,
+      3.7 + Math.sin(a) * 1.5,
+    );
     s.scale.setScalar(0.6 + (i % 3) * 0.25);
     g.add(s);
   }
@@ -34,7 +40,13 @@ export function island(ground: THREE.MeshStandardMaterial): THREE.Group {
 }
 
 export function oak(): THREE.Group {
-  const trunk = mesh(new THREE.CylinderGeometry(0.22, 0.34, 2.2, 7), mat(C.bark, { flat: true }), 0, 1.1, 0);
+  const trunk = mesh(
+    new THREE.CylinderGeometry(0.22, 0.34, 2.2, 7),
+    mat(C.bark, { flat: true }),
+    0,
+    1.1,
+    0,
+  );
   const g = group(trunk);
   const blobs: [number, number, number, number][] = [
     [0, 2.9, 0, 1.3],
@@ -43,7 +55,13 @@ export function oak(): THREE.Group {
     [0.1, 3.5, -0.3, 0.85],
   ];
   blobs.forEach(([x, y, z, r], i) => {
-    const b = mesh(new THREE.IcosahedronGeometry(r, 1), mat(i % 2 ? C.leafDark : C.leaf, { flat: true }), x, y, z);
+    const b = mesh(
+      new THREE.IcosahedronGeometry(r, 1),
+      mat(i % 2 ? C.leafDark : C.leaf, { flat: true }),
+      x,
+      y,
+      z,
+    );
     g.add(b);
   });
   return g;
@@ -52,7 +70,13 @@ export function oak(): THREE.Group {
 export function pine(scale = 1): THREE.Group {
   const g = group(mesh(new THREE.CylinderGeometry(0.1, 0.14, 0.6, 6), mat(C.bark), 0, 0.3, 0));
   for (let i = 0; i < 3; i++) {
-    const cone = mesh(new THREE.ConeGeometry(0.9 - i * 0.22, 1.1, 7), mat(C.pine, { flat: true }), 0, 0.9 + i * 0.6, 0);
+    const cone = mesh(
+      new THREE.ConeGeometry(0.9 - i * 0.22, 1.1, 7),
+      mat(C.pine, { flat: true }),
+      0,
+      0.9 + i * 0.6,
+      0,
+    );
     g.add(cone);
   }
   g.scale.setScalar(scale);
@@ -62,7 +86,8 @@ export function pine(scale = 1): THREE.Group {
 export function picnicTable(): THREE.Group {
   const wood = mat(C.wood, { flat: true });
   const g = group(mesh(new THREE.BoxGeometry(2.2, 0.08, 0.9), wood, 0, 0.78, 0));
-  for (const z of [-0.72, 0.72]) g.add(mesh(new THREE.BoxGeometry(2.2, 0.07, 0.3), wood, 0, 0.45, z));
+  for (const z of [-0.72, 0.72])
+    g.add(mesh(new THREE.BoxGeometry(2.2, 0.07, 0.3), wood, 0, 0.45, z));
   for (const x of [-0.85, 0.85]) {
     for (const s of [-1, 1]) {
       const leg = mesh(new THREE.BoxGeometry(0.08, 0.95, 0.08), mat(C.woodDark), x, 0.4, s * 0.45);
@@ -81,7 +106,8 @@ export function chair(): THREE.Group {
     mesh(new THREE.BoxGeometry(0.6, 0.55, 0.05), canvas, 0, 0.75, -0.28),
   );
   for (const x of [-0.28, 0.28]) {
-    for (const z of [-0.25, 0.25]) g.add(mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.45, 5), frame, x, 0.22, z));
+    for (const z of [-0.25, 0.25])
+      g.add(mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.45, 5), frame, x, 0.22, z));
     g.add(mesh(new THREE.BoxGeometry(0.05, 0.05, 0.5), frame, x, 0.62, 0));
   }
   return g;
@@ -98,7 +124,8 @@ export function tent(): THREE.Group {
   const body = mesh(geo, mat(C.tent, { flat: true }));
   const door = mesh(new THREE.PlaneGeometry(0.6, 0.8), mat(0x3f5f48), 0, 0.4, 0.905);
   const g = group(body, door);
-  for (const z of [-0.95, 0.95]) g.add(mesh(new THREE.CylinderGeometry(0.02, 0.02, 1.4, 4), mat(C.metal), 0, 0.7, z));
+  for (const z of [-0.95, 0.95])
+    g.add(mesh(new THREE.CylinderGeometry(0.02, 0.02, 1.4, 4), mat(C.metal), 0, 0.7, z));
   return g;
 }
 
@@ -142,7 +169,13 @@ export function bellPost(): THREE.Group {
   const bell = new THREE.Group();
   bell.name = "bell";
   bell.position.set(-0.6, 2.24, 0);
-  const cup = mesh(new THREE.CylinderGeometry(0.09, 0.22, 0.32, 14, 1, true), mat(C.brass, { rough: 0.35 }), 0, -0.2, 0);
+  const cup = mesh(
+    new THREE.CylinderGeometry(0.09, 0.22, 0.32, 14, 1, true),
+    mat(C.brass, { rough: 0.35 }),
+    0,
+    -0.2,
+    0,
+  );
   (cup.material as THREE.Material).side = THREE.DoubleSide;
   bell.add(cup, mesh(new THREE.SphereGeometry(0.05, 8, 6), mat(C.ink), 0, -0.36, 0));
   const cord = mesh(new THREE.CylinderGeometry(0.012, 0.012, 1.3, 4), mat(C.rope), 0, -0.95, 0);
@@ -153,7 +186,13 @@ export function bellPost(): THREE.Group {
 }
 
 export function sunClock(): THREE.Group {
-  const stump = mesh(new THREE.CylinderGeometry(0.35, 0.42, 0.5, 9), mat(C.bark, { flat: true }), 0, 0.25, 0);
+  const stump = mesh(
+    new THREE.CylinderGeometry(0.35, 0.42, 0.5, 9),
+    mat(C.bark, { flat: true }),
+    0,
+    0.25,
+    0,
+  );
   const dial = mesh(new THREE.CylinderGeometry(0.33, 0.33, 0.04, 20), mat(C.canvas), 0, 0.52, 0);
   const gnomon = mesh(new THREE.BoxGeometry(0.02, 0.22, 0.2), mat(C.brass), 0, 0.62, 0);
   const shadow = mesh(new THREE.BoxGeometry(0.24, 0.005, 0.04), mat(C.ink), 0.14, 0.545, 0.04);
@@ -163,7 +202,13 @@ export function sunClock(): THREE.Group {
 
 export function windsock(): THREE.Group {
   const pole = mesh(new THREE.CylinderGeometry(0.03, 0.03, 2.2, 5), mat(C.metal), 0, 1.1, 0);
-  const sock = mesh(new THREE.CylinderGeometry(0.12, 0.06, 0.7, 10, 1, true), mat(C.sock), 0.05, 1.8, 0);
+  const sock = mesh(
+    new THREE.CylinderGeometry(0.12, 0.06, 0.7, 10, 1, true),
+    mat(C.sock),
+    0.05,
+    1.8,
+    0,
+  );
   (sock.material as THREE.Material).side = THREE.DoubleSide;
   sock.name = "sock";
   return group(pole, sock);
@@ -174,7 +219,11 @@ export function hammock(a: THREE.Vector3, b: THREE.Vector3, sag = 0.45): THREE.G
   const mid = a.clone().lerp(b, 0.5);
   mid.y -= sag;
   const curve = new THREE.QuadraticBezierCurve3(a, mid, b);
-  const inner = new THREE.QuadraticBezierCurve3(a.clone().lerp(mid, 0.25), mid, b.clone().lerp(mid, 0.25));
+  const inner = new THREE.QuadraticBezierCurve3(
+    a.clone().lerp(mid, 0.25),
+    mid,
+    b.clone().lerp(mid, 0.25),
+  );
   const bed = mesh(new THREE.TubeGeometry(inner, 12, 0.2, 6, false), mat(C.canvas, { flat: true }));
   const line = mesh(new THREE.TubeGeometry(curve, 16, 0.02, 4, false), mat(C.rope));
   return group(bed, line);

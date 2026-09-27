@@ -5,11 +5,35 @@ import type { CaseDef } from "../game/types";
 
 const LOOKS: Record<
   CaseDef["time"],
-  { sky: number; key: number; keyI: number; keyPos: [number, number, number]; hemi: [number, number, number] }
+  {
+    sky: number;
+    key: number;
+    keyI: number;
+    keyPos: [number, number, number];
+    hemi: [number, number, number];
+  }
 > = {
-  afternoon: { sky: 0xf1d9ab, key: 0xffe2b5, keyI: 3.2, keyPos: [2, 10, 8], hemi: [0xd6e6ff, 0x7c8f55, 1.15] },
-  rain: { sky: 0x8d99a7, key: 0xc9d6e6, keyI: 1.4, keyPos: [3, 10, 6], hemi: [0xb0bfcf, 0x55664a, 1.5] },
-  dawn: { sky: 0xeebdad, key: 0xffbf96, keyI: 2.7, keyPos: [9, 5, 5], hemi: [0xf5c8d8, 0x6d7a5a, 1.05] },
+  afternoon: {
+    sky: 0xf1d9ab,
+    key: 0xffe2b5,
+    keyI: 3.2,
+    keyPos: [2, 10, 8],
+    hemi: [0xd6e6ff, 0x7c8f55, 1.15],
+  },
+  rain: {
+    sky: 0x8d99a7,
+    key: 0xc9d6e6,
+    keyI: 1.4,
+    keyPos: [3, 10, 6],
+    hemi: [0xb0bfcf, 0x55664a, 1.5],
+  },
+  dawn: {
+    sky: 0xeebdad,
+    key: 0xffbf96,
+    keyI: 2.7,
+    keyPos: [9, 5, 5],
+    hemi: [0xf5c8d8, 0x6d7a5a, 1.05],
+  },
 };
 
 export class Lighting {

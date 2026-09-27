@@ -4,9 +4,21 @@ import { C, group, mat, mesh } from "./palette";
 // Small movable evidence: baskets, books, pegs, and the marks things leave on the ground.
 
 export function basket(): THREE.Group {
-  const body = mesh(new THREE.BoxGeometry(0.5, 0.28, 0.34), mat(C.wood, { flat: true }), 0, 0.14, 0);
+  const body = mesh(
+    new THREE.BoxGeometry(0.5, 0.28, 0.34),
+    mat(C.wood, { flat: true }),
+    0,
+    0.14,
+    0,
+  );
   const lid = mesh(new THREE.BoxGeometry(0.52, 0.04, 0.36), mat(C.check), 0, 0.3, 0);
-  const handle = mesh(new THREE.TorusGeometry(0.16, 0.02, 5, 12, Math.PI), mat(C.woodDark), 0, 0.3, 0);
+  const handle = mesh(
+    new THREE.TorusGeometry(0.16, 0.02, 5, 12, Math.PI),
+    mat(C.woodDark),
+    0,
+    0.3,
+    0,
+  );
   return group(body, lid, handle);
 }
 

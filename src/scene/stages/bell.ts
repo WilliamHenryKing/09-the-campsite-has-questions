@@ -20,8 +20,16 @@ function sling(w: World) {
 }
 
 function build(w: World) {
-  const t = trail([v(START.x + 0.85, 0, START.z), v(END.x + 0.85, 0, END.z)], 0.18, groovePair(0.9));
-  const t2 = trail([v(START.x - 0.85, 0, START.z), v(END.x - 0.85, 0, END.z)], 0.18, groovePair(0.9));
+  const t = trail(
+    [v(START.x + 0.85, 0, START.z), v(END.x + 0.85, 0, END.z)],
+    0.18,
+    groovePair(0.9),
+  );
+  const t2 = trail(
+    [v(START.x - 0.85, 0, START.z), v(END.x - 0.85, 0, END.z)],
+    0.18,
+    groovePair(0.9),
+  );
   const g = new THREE.Group();
   g.add(...t.group.children, ...t2.group.children);
   w.extras.add(g);

@@ -96,7 +96,16 @@ export const tentStage: Stage = {
     } else if (id === "pegs") {
       walk(tl, gus.root, v(PITCH.x - 0.4, 0, PITCH.z + 1.3), 0.8);
       w.pegs.children.forEach((peg, i) => {
-        tl.to(peg.position, { x: STACK.x, y: STACK.y + (i > 1 ? 0.05 : 0), z: STACK.z + (i % 2) * 0.06, duration: 0.3 }, i ? "<0.15" : ">");
+        tl.to(
+          peg.position,
+          {
+            x: STACK.x,
+            y: STACK.y + (i > 1 ? 0.05 : 0),
+            z: STACK.z + (i % 2) * 0.06,
+            duration: 0.3,
+          },
+          i ? "<0.15" : ">",
+        );
         tl.to(peg.rotation, { z: Math.PI / 2, duration: 0.3 }, "<");
       });
       tl.to(w.tent.scale, { x: 0.01, y: 0.01, z: 0.01, duration: 0.5, ease: "back.in" });
@@ -104,11 +113,20 @@ export const tentStage: Stage = {
         w.tent.visible = false;
         gus.cape.visible = true;
       });
-      tl.fromTo(gus.cape.scale, { x: 0.2, y: 0.2, z: 0.2 }, { x: 1, y: 1, z: 1, duration: 0.4, ease: "back.out" });
+      tl.fromTo(
+        gus.cape.scale,
+        { x: 0.2, y: 0.2, z: 0.2 },
+        { x: 1, y: 1, z: 1, duration: 0.4, ease: "back.out" },
+      );
       faceFront(tl, gus.root);
     } else if (id === "kettle") {
       walk(tl, gus.root, v(-0.9, 0, 2.5), 1.1);
-      tl.to(w.kettle.position, { x: KETTLE_TIPPED.x, y: KETTLE_TIPPED.y, z: KETTLE_TIPPED.z, duration: 0.4 });
+      tl.to(w.kettle.position, {
+        x: KETTLE_TIPPED.x,
+        y: KETTLE_TIPPED.y,
+        z: KETTLE_TIPPED.z,
+        duration: 0.4,
+      });
       tl.to(w.kettle.rotation, { z: 1.4, y: 0.4, duration: 0.4, ease: "bounce.out" }, "<");
       tl.add(() => {
         m.puddle.visible = true;
@@ -138,7 +156,8 @@ export const tentStage: Stage = {
       });
       // The windsock does not so much as twitch.
       const sock = w.windsock.getObjectByName("sock");
-      if (sock) tl.add(gsap.to(sock.rotation, { z: 0.02, duration: 0.2, yoyo: true, repeat: 1 }), "<");
+      if (sock)
+        tl.add(gsap.to(sock.rotation, { z: 0.02, duration: 0.2, yoyo: true, repeat: 1 }), "<");
     }
   },
 };

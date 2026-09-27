@@ -7,11 +7,22 @@ import { faceFront, type Stage, v, walk } from "./stage";
 
 // Case 1: the picnic crept across camp after the shade.
 
-const GROOVE_PATH = [v(0.6, 0, 1.35), v(-0.9, 0, 0.75), v(-1.9, 0, 0.5), v(-3.1, 0, -0.3), v(-4.4, 0, -1.8)];
+const GROOVE_PATH = [
+  v(0.6, 0, 1.35),
+  v(-0.9, 0, 0.75),
+  v(-1.9, 0, 0.5),
+  v(-3.1, 0, -0.3),
+  v(-4.4, 0, -1.8),
+];
 const DRIP_PATH = [v(0.1, 0, 0.85), v(-1.4, 0, 1.3), v(-3.0, 0, 0.5), v(-4.6, 0, -1.9)];
 const BOOK_DOWN = v(-1.9, 0.01, -0.2);
 
-let marks: { grooves: THREE.Group; groove: THREE.Curve<THREE.Vector3>; drips: THREE.Group; drip: THREE.Curve<THREE.Vector3> } | null = null;
+let marks: {
+  grooves: THREE.Group;
+  groove: THREE.Curve<THREE.Vector3>;
+  drips: THREE.Group;
+  drip: THREE.Curve<THREE.Vector3>;
+} | null = null;
 
 function build(w: World) {
   const g = trail(GROOVE_PATH, 0.22, groovePair());
@@ -70,7 +81,13 @@ export const picnicStage: Stage = {
     if (!m) return;
     if (id === "nap") {
       tl.add(() => w.sleep("marge", true));
-      tl.to(w.book.position, { x: BOOK_DOWN.x, y: BOOK_DOWN.y, z: BOOK_DOWN.z, duration: 0.7, ease: "bounce.out" });
+      tl.to(w.book.position, {
+        x: BOOK_DOWN.x,
+        y: BOOK_DOWN.y,
+        z: BOOK_DOWN.z,
+        duration: 0.7,
+        ease: "bounce.out",
+      });
       tl.to(w.book.rotation, { y: 0.7, z: 0.4, duration: 0.35, yoyo: true, repeat: 1 }, "<");
     } else if (id === "chair") {
       const pip = w.cast.pip.root;
