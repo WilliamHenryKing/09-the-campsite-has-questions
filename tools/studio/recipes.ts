@@ -87,8 +87,8 @@ const fireRing: Build = (seed) => {
 const evidence: Build = (seed, index) => {
   const r = rng(seed);
   switch (index % 6) {
-    case 0: // bootprint cast
-      return displace(extrude((x, y) => Math.hypot(x / 0.06, (y - 0.03) / 0.14) - 1, [-0.07, -0.12, 0.07, 0.18], 0.03, 0.01, mat(0xd9d0c0, 0.9)), 0.004, 40, 3, seed);
+    case 0: // bootprint cast, lying flat, with the tread pressed into its top
+      return rotate(carve(0.002, displace(extrude((x, y) => Math.hypot(x / 0.06, (y - 0.03) / 0.14) - 1, [-0.07, -0.12, 0.07, 0.18], 0.03, 0.01, mat(0xd9d0c0, 0.9)), 0.003, 40, 3, seed), union(...[-0.06, -0.02, 0.02, 0.06, 0.1].map((y) => move(box(0.1, 0.012, 0.02), [0, y, 0.015])))), [-Math.PI / 2, 0, 0]);
     case 1: // marshmallow stick
       return union(capsule([0, 0, 0], [0.5, 0.05, 0], 0.006, 0.004, mat(0x8a6a45, 0.8)), move(cylinder(0.018, 0.03, 0.008, mat(0xf2e6d6, 0.9)), [0.52, 0.052, 0]));
     case 2: // torn map
