@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { bear } from "../characters";
+import { cue } from "../cues";
 import { C } from "../palette";
 import { groovePair, revealTrail, trail } from "../smallProps";
 import { lieDown, place, type World } from "../world";
@@ -77,14 +78,20 @@ export const bellStage: Stage = {
     const marge = w.cast.marge.root;
     if (id === "tie") {
       walk(tl, marge, v(1.6, 0, 1.2), 0.8);
-      tl.add(() => sling(w));
+      tl.add(() => {
+        sling(w);
+        cue("cloth");
+      });
       tl.to(marge.scale, { y: 0.9, duration: 0.2, yoyo: true, repeat: 3 });
     } else if (id === "dew") {
       const dew = new THREE.Color(C.grassDew);
       tl.to(w.ground.color, { r: dew.r, g: dew.g, b: dew.b, duration: 1.4 });
     } else if (id === "lurch") {
       walk(tl, marge, v(2.4, 0, 1.2), 0.6);
-      tl.add(() => lieDown(marge, 2.95, 0.72, 0.55));
+      tl.add(() => {
+        lieDown(marge, 2.95, 0.72, 0.55);
+        cue("creak");
+      });
       const p = { t: 0 };
       tl.to(p, {
         t: 1,
@@ -112,6 +119,7 @@ export const bellStage: Stage = {
       place(b, -6.5, 0, -1.2);
       w.extras.add(b);
       walk(tl, b, v(-2.3, 0, 0.4), 1.2);
+      tl.add(() => cue("thud"));
       tl.to(w.table.position, { x: "+=0.15", duration: 0.12, yoyo: true, repeat: 3 });
       ring(tl, w.bell, "<");
       walk(tl, b, v(-6.5, 0, 3), 1.0);

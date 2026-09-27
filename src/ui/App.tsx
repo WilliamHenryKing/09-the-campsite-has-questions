@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import { sound } from "../audio/sound";
 import { CASES } from "../game/cases";
 import { isCorrect } from "../game/rules";
 import { currentCase, initialState, reducer } from "../game/state";
@@ -6,11 +7,13 @@ import type { CharacterId } from "../game/types";
 import { worldReady } from "../loader";
 import { CampScene } from "../scene/CampScene";
 import { Board } from "./Board";
+import { MuteButton } from "./MuteButton";
 import { Hint, InspectPanel, IntroCard, TalkPanel } from "./Panels";
 import { Replay } from "./Replay";
 import { Finale, ReportCard } from "./Report";
 import { Tags } from "./Tags";
 import { useReplay } from "./useReplay";
+import { useSoundscape } from "./useSoundscape";
 
 const reducedMotion = () =>
   typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -26,6 +29,7 @@ export function App() {
   const [hint, setHint] = useState(true);
   const [report, setReport] = useState<{ image: string | null } | null>(null);
   const { replay, run, clear } = useReplay(scene);
+  useSoundscape(def.time, replay !== null || report !== null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -57,17 +61,20 @@ export function App() {
     setTalking(null);
     setBoard(false);
     setHint(false);
+    sound.play("pickup");
     setInspecting(id);
     dispatch({ type: "inspect", clueId: id });
   };
   const openTalk = (id: CharacterId) => {
     setInspecting(null);
+    sound.play("talk");
     setTalking(id);
     dispatch({ type: "talk", character: id });
   };
 
   const test = async () => {
     setBoard(false);
+    sound.play("click");
     dispatch({ type: "tested" });
     await run(def, { order: state.order, explanation: state.explanation }, state.found, "test");
   };
@@ -81,7 +88,9 @@ export function App() {
   const file = async () => {
     const recon = { order: state.order, explanation: state.explanation };
     dispatch({ type: "file" });
+    sound.play("stamp");
     if (!isCorrect(def, recon)) {
+      sound.play("returned");
       backToBoard();
       return;
     }
@@ -93,6 +102,7 @@ export function App() {
   };
 
   const next = () => {
+    sound.play("click");
     setReport(null);
     dispatch({ type: "next" });
   };
@@ -123,7 +133,10 @@ export function App() {
       } else if ((e.key === "b" || e.key === "B") && state.phase === "investigate" && !replay) {
         setInspecting(null);
         setTalking(null);
-        setBoard((b) => !b);
+        setBoard((b) => {
+          sound.play(b ? "board-close" : "board-open");
+          return !b;
+        });
       }
     };
     window.addEventListener("keydown", onKey);
@@ -140,6 +153,7 @@ export function App() {
     const d = drag.current;
     if (!d || d.id !== e.pointerId || !scene) return;
     scene.turn((e.clientX - d.x) * 0.006, (e.clientY - d.y) * 0.006);
+    if (inspecting) sound.play("turn", { volume: 0.5, gap: 0.25 });
     d.x = e.clientX;
     d.y = e.clientY;
   };
@@ -198,16 +212,32 @@ export function App() {
       )}
 
       {state.phase === "intro" && (
-        <IntroCard def={def} onBegin={() => dispatch({ type: "begin" })} />
+        <IntroCard
+          def={def}
+          onBegin={() => {
+            sound.play("begin");
+            dispatch({ type: "begin" });
+          }}
+        />
       )}
 
       {state.phase === "investigate" && !replay && !panelOpen && (
         <div className="dock">
-          {state.caseIndex === 0 && hint && <Hint onClose={() => setHint(false)} />}
+          {state.caseIndex === 0 && hint && (
+            <Hint
+              onClose={() => {
+                sound.play("click");
+                setHint(false);
+              }}
+            />
+          )}
           <button
             type="button"
             className="btn btn-primary btn-board"
-            onClick={() => setBoard(true)}
+            onClick={() => {
+              sound.play("board-open");
+              setBoard(true);
+            }}
             aria-keyshortcuts="B"
           >
             Incident Board
@@ -218,22 +248,45 @@ export function App() {
       {clue && (
         <InspectPanel
           clue={clue}
-          onTurn={(x, y) => scene?.turn(x, y)}
-          onClose={() => setInspecting(null)}
+          onTurn={(x, y) => {
+            sound.play("turn");
+            scene?.turn(x, y);
+          }}
+          onClose={() => {
+            sound.play("click");
+            setInspecting(null);
+          }}
         />
       )}
       {talking && (
-        <TalkPanel def={def} who={talking} found={state.found} onClose={() => setTalking(null)} />
+        <TalkPanel
+          def={def}
+          who={talking}
+          found={state.found}
+          onClose={() => {
+            sound.play("click");
+            setTalking(null);
+          }}
+        />
       )}
       {board && state.phase === "investigate" && (
         <Board
           def={def}
           state={state}
-          onMove={(eventId, delta) => dispatch({ type: "move", eventId, delta })}
-          onChoose={(explanation) => dispatch({ type: "choose", explanation })}
+          onMove={(eventId, delta) => {
+            sound.play("tick");
+            dispatch({ type: "move", eventId, delta });
+          }}
+          onChoose={(explanation) => {
+            sound.play("select");
+            dispatch({ type: "choose", explanation });
+          }}
           onTest={test}
           onFile={file}
-          onClose={() => setBoard(false)}
+          onClose={() => {
+            sound.play("board-close");
+            setBoard(false);
+          }}
         />
       )}
       {replay && <Replay def={def} replay={replay} onBack={backToBoard} onFile={file} />}
@@ -249,8 +302,15 @@ export function App() {
         />
       )}
       {state.phase === "finale" && (
-        <Finale results={state.results} onReplay={() => dispatch({ type: "restart" })} />
+        <Finale
+          results={state.results}
+          onReplay={() => {
+            sound.play("begin");
+            dispatch({ type: "restart" });
+          }}
+        />
       )}
+      <MuteButton />
     </main>
   );
 }

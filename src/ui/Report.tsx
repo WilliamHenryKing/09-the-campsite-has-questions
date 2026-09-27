@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { sound } from "../audio/sound";
 import { CASES, CAST } from "../game/cases";
 import type { CaseDef } from "../game/types";
 import { useAutoFocus } from "./useAutoFocus";
@@ -27,6 +29,7 @@ interface ReportProps {
 /** The illustrated incident report: the payoff for a closed case. */
 export function ReportCard({ def, image, acorns, returned, isLast, onNext }: ReportProps) {
   const focus = useAutoFocus<HTMLButtonElement>();
+  useEffect(() => sound.play("jingle-closed"), []);
   const doubtful = def.statements.filter((s) => s.contradictedBy);
   return (
     <div className="veil">
@@ -74,6 +77,7 @@ export function ReportCard({ def, image, acorns, returned, isLast, onNext }: Rep
 
 export function Finale({ results, onReplay }: { results: number[]; onReplay: () => void }) {
   const focus = useAutoFocus<HTMLButtonElement>();
+  useEffect(() => sound.play("jingle-finale"), []);
   const total = results.reduce((a, b) => a + b, 0);
   return (
     <div className="veil">

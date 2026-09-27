@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from "react";
+import { sound } from "../audio/sound";
 import { evaluate } from "../game/rules";
 import type { CaseDef, Evaluation, Reconstruction } from "../game/types";
 import type { CampScene } from "../scene/CampScene";
@@ -43,6 +44,17 @@ export function useReplay(scene: CampScene | null) {
         const clueId =
           i < recon.order.length ? evaluation.steps[i]?.clueId : evaluation.explanation.clueId;
         if (failed && clueId) scene.flag(clueId);
+        if (beat) {
+          const status =
+            i < recon.order.length ? evaluation.steps[i]?.status : evaluation.explanation.status;
+          sound.play(
+            mode === "payoff" || status === "supported"
+              ? "beat-ok"
+              : status === "contradiction"
+                ? "contradiction"
+                : "beat-unproven",
+          );
+        }
         state = { ...state, shown: i + 1, stoppedAt: failed ? i : null, done: failed };
         setReplay(state);
         if (failed) return state;

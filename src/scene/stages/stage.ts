@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { cue } from "../cues";
 import type { World } from "../world";
 
 /** How one case arranges and animates the shared campground. */
@@ -32,12 +33,23 @@ export function walk(
   const body = o.children[0];
   // An odd repeat count makes the yoyo land back on the ground.
   const hops = Math.max(1, Math.round(duration / 0.12)) | 1;
-  if (body) tl.to(body.position, { y: 0.08, duration: 0.12, yoyo: true, repeat: hops }, "<");
+  if (body) {
+    let n = 0;
+    const footfall = () => {
+      if (n++ % 2 === 0) cue("step");
+    };
+    tl.to(
+      body.position,
+      { y: 0.08, duration: 0.12, yoyo: true, repeat: hops, onStart: footfall, onRepeat: footfall },
+      "<",
+    );
+  }
 }
 
 /** Swing the bell a few times. */
 export function ring(tl: gsap.core.Timeline, bell: THREE.Object3D, at?: string | number) {
-  tl.to(bell.rotation, { z: 0.5, duration: 0.12, yoyo: true, repeat: 5, ease: "sine.inOut" }, at);
+  tl.add(() => cue("bell"), at);
+  tl.to(bell.rotation, { z: 0.5, duration: 0.12, yoyo: true, repeat: 5, ease: "sine.inOut" }, "<");
   tl.set(bell.rotation, { z: 0 });
 }
 

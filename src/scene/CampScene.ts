@@ -2,6 +2,7 @@ import gsap from "gsap";
 import * as THREE from "three";
 import type { CaseDef, CharacterId } from "../game/types";
 import type { Character } from "./characters";
+import { muteCues } from "./cues";
 import { pulseRing } from "./effects";
 import { Inspector } from "./inspector";
 import { Lighting } from "./lighting";
@@ -161,7 +162,9 @@ export class CampScene {
     return new Promise((resolve) => {
       if (this.reducedMotion) {
         // Jump to the outcome, then hold it long enough to read.
+        muteCues(true);
         tl.progress(1);
+        muteCues(false);
         window.setTimeout(resolve, 650);
         return;
       }
@@ -173,7 +176,9 @@ export class CampScene {
   private stop() {
     if (this.running) {
       this.running.eventCallback("onComplete", null);
+      muteCues(true);
       this.running.progress(1).kill();
+      muteCues(false);
       this.running = null;
     }
   }

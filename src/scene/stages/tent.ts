@@ -1,5 +1,6 @@
 import gsap from "gsap";
 import * as THREE from "three";
+import { cue } from "../cues";
 import { rain } from "../effects";
 import { C } from "../palette";
 import { flatPatch, puddle } from "../smallProps";
@@ -90,12 +91,14 @@ export const tentStage: Stage = {
         m.rain.visible = true;
         // The patch only stays dry if the tent is still standing over it.
         m.dry.visible = w.tent.visible;
+        cue("cloth");
       });
       const wet = new THREE.Color(C.grassWet);
       tl.to(w.ground.color, { r: wet.r, g: wet.g, b: wet.b, duration: 1.4 });
     } else if (id === "pegs") {
       walk(tl, gus.root, v(PITCH.x - 0.4, 0, PITCH.z + 1.3), 0.8);
       w.pegs.children.forEach((peg, i) => {
+        tl.add(() => cue("peg"), i ? "<0.15" : ">");
         tl.to(
           peg.position,
           {
@@ -112,6 +115,7 @@ export const tentStage: Stage = {
       tl.add(() => {
         w.tent.visible = false;
         gus.cape.visible = true;
+        cue("cloth");
       });
       tl.fromTo(
         gus.cape.scale,
@@ -130,6 +134,7 @@ export const tentStage: Stage = {
       tl.to(w.kettle.rotation, { z: 1.4, y: 0.4, duration: 0.4, ease: "bounce.out" }, "<");
       tl.add(() => {
         m.puddle.visible = true;
+        cue("kettle");
       });
       tl.fromTo(m.puddle.scale, { x: 0.1, y: 0.1 }, { x: 1, y: 0.6, duration: 0.5 });
       walk(tl, gus.root, v(-0.3, 0, 2.3), 0.4);
@@ -140,6 +145,7 @@ export const tentStage: Stage = {
   explain(w, id, tl) {
     const gus = w.cast.gus;
     if (id === "poncho") {
+      tl.add(() => cue("cloth"));
       tl.to(gus.root.rotation, { y: "+=6.283", duration: 0.9, ease: "power2.inOut" });
       tl.to(gus.cape.scale, { x: 1.25, z: 1.25, duration: 0.3, yoyo: true, repeat: 1 }, "<0.2");
     } else {
@@ -148,6 +154,7 @@ export const tentStage: Stage = {
       flyer.scale.setScalar(1);
       place(flyer, PITCH.x, 0, PITCH.z, PITCH_RY);
       w.extras.add(flyer);
+      tl.add(() => cue("cloth"));
       tl.to(flyer.position, { x: 4.6, y: 2.4, z: 2.5, duration: 1.1, ease: "power1.out" });
       tl.to(flyer.rotation, { x: 1.2, z: 0.8, duration: 1.1 }, "<");
       tl.to(flyer.position, { y: -0.6, duration: 0.5, ease: "power2.in" });

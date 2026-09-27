@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { raccoon } from "../characters";
+import { cue } from "../cues";
 import { C, mat, mesh } from "../palette";
 import { drip, groovePair, revealTrail, trail } from "../smallProps";
 import { lieDown, place, type World } from "../world";
@@ -88,7 +89,10 @@ export const picnicStage: Stage = {
     const m = marks;
     if (!m) return;
     if (id === "nap") {
-      tl.add(() => w.sleep("marge", true));
+      tl.add(() => {
+        w.sleep("marge", true);
+        cue("book");
+      });
       tl.to(w.book.position, {
         x: BOOK_DOWN.x,
         y: BOOK_DOWN.y,
@@ -100,6 +104,7 @@ export const picnicStage: Stage = {
     } else if (id === "chair") {
       const pip = w.cast.pip.root;
       walk(tl, pip, v(0.9, 0, 1.9), 0.5);
+      tl.add(() => cue("creak"));
       const p = { t: 0 };
       tl.to(p, {
         t: 1,
@@ -116,6 +121,7 @@ export const picnicStage: Stage = {
         },
       });
       tl.to(w.chair.rotation, { y: 0.4, duration: 0.3 });
+      tl.add(() => cue("creak"));
     } else if (id === "basket") {
       const pip = w.cast.pip.root;
       walk(tl, pip, v(0.1, 0, 1.2), 0.7);
@@ -135,6 +141,7 @@ export const picnicStage: Stage = {
           revealTrail(m.drips, p.t);
         },
       });
+      tl.add(() => cue("thud"));
       tl.to(w.basket.position, { x: SHADE.basket.x, y: 0, z: SHADE.basket.z, duration: 0.4 });
       tl.to(w.jug.position, { x: SHADE.jug.x, y: 0, z: SHADE.jug.z, duration: 0.4 }, "<");
       tl.to(w.blanket.position, { x: SHADE.basket.x, y: 0, z: SHADE.basket.z, duration: 0.5 }, "<");
@@ -149,6 +156,7 @@ export const picnicStage: Stage = {
       const pip = w.cast.pip.root;
       walk(tl, pip, v(SHADE.chair.x, 0.25, SHADE.chair.z + 0.05), 0.5);
       tl.to(pip.rotation, { y: 0.4, duration: 0.3 });
+      tl.add(() => cue("cloth"));
       tl.to(w.cast.pip.body.scale, { x: 1.12, y: 0.9, duration: 0.3, yoyo: true, repeat: 1 });
     } else {
       const r = raccoon();
