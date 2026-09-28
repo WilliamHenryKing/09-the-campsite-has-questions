@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 360" width="1280" height="360" role="img" aria-label="THE CAMPSITE HAS QUESTIONS: Inspect the evidence, hear the campers out, rebuild what happened.">
+<title>THE CAMPSITE HAS QUESTIONS</title>
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14251b"/><stop offset="1" stop-color="#2a4430"/></linearGradient>
+<radialGradient id="glow" cx="0.78" cy="0.45" r="0.55"><stop offset="0" stop-color="#f0a04b" stop-opacity="0.42"/><stop offset="1" stop-color="#f0a04b" stop-opacity="0"/></radialGradient>
+<linearGradient id="scan" x1="0" x2="1"><stop offset="0" stop-color="#f0a04b" stop-opacity="0"/><stop offset="0.5" stop-color="#f0a04b" stop-opacity="0.18"/><stop offset="1" stop-color="#f0a04b" stop-opacity="0"/></linearGradient>
+</defs>
+<style>
+.t{font-family:Georgia, 'Times New Roman', serif;font-weight:700;fill:#f3ecd9;letter-spacing:-0.01em;animation:rise 1.1s ease-out both}
+.e{font-family:'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:700;font-size:17px;letter-spacing:0.28em;fill:#f0a04b;animation:rise 0.9s ease-out both}
+.g{font-family:'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:24px;fill:#f3ecd9;opacity:0.82;animation:rise 1.3s ease-out 0.45s both}
+.u{animation:grow 1.4s ease-out 0.6s both;transform-origin:72px 0}
+.glow{animation:breathe 7s ease-in-out infinite;transform-origin:1000px 160px}
+.p{animation:drift linear infinite}
+.ring{transform-origin:1010px 180px;animation:spin linear infinite}
+.wave{animation:slide linear infinite}
+.scan{animation:sweep 6s linear infinite}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes breathe{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+@keyframes drift{0%{transform:translateY(0);opacity:0}15%{opacity:.9}100%{transform:translateY(-190px);opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slide{to{transform:translateX(-160px)}}
+@keyframes sweep{to{transform:translateX(1520px)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+<rect width="1280" height="360" fill="url(#bg)"/>
+<rect class="glow" width="1280" height="360" fill="url(#glow)"/>
+<circle class="p" cx="28" cy="262" r="1.3" fill="#f0a04b" style="animation-duration:12.4s;animation-delay:-3.5s"/><circle class="p" cx="26" cy="175" r="1.8" fill="#7fa874" style="animation-duration:10.2s;animation-delay:-0.7s"/><circle class="p" cx="559" cy="181" r="1.2" fill="#7fa874" style="animation-duration:8.5s;animation-delay:-11.3s"/><circle class="p" cx="953" cy="341" r="2.2" fill="#f0a04b" style="animation-duration:7.6s;animation-delay:-2.7s"/><circle class="p" cx="148" cy="237" r="3.3" fill="#7fa874" style="animation-duration:7.6s;animation-delay:-5.1s"/><circle class="p" cx="30" cy="207" r="3.1" fill="#7fa874" style="animation-duration:13.8s;animation-delay:-6.2s"/><circle class="p" cx="197" cy="266" r="1.5" fill="#f0a04b" style="animation-duration:7.9s;animation-delay:-8.7s"/><circle class="p" cx="590" cy="277" r="1.9" fill="#7fa874" style="animation-duration:6.2s;animation-delay:-10.0s"/><circle class="p" cx="320" cy="245" r="1.9" fill="#7fa874" style="animation-duration:12.8s;animation-delay:-1.6s"/><circle class="p" cx="644" cy="322" r="3.1" fill="#f0a04b" style="animation-duration:12.2s;animation-delay:-10.1s"/><circle class="p" cx="582" cy="371" r="2.1" fill="#7fa874" style="animation-duration:13.1s;animation-delay:-10.9s"/><circle class="p" cx="1138" cy="256" r="3.3" fill="#7fa874" style="animation-duration:6.4s;animation-delay:-8.8s"/><circle class="p" cx="465" cy="292" r="2.0" fill="#f0a04b" style="animation-duration:12.6s;animation-delay:-9.4s"/><circle class="p" cx="280" cy="265" r="3.0" fill="#7fa874" style="animation-duration:9.8s;animation-delay:-5.6s"/><circle class="p" cx="1242" cy="208" r="3.5" fill="#7fa874" style="animation-duration:13.2s;animation-delay:-10.5s"/><circle class="p" cx="1211" cy="285" r="2.4" fill="#f0a04b" style="animation-duration:10.6s;animation-delay:-9.5s"/><circle class="p" cx="383" cy="219" r="1.5" fill="#7fa874" style="animation-duration:6.3s;animation-delay:-11.2s"/><circle class="p" cx="1162" cy="187" r="3.6" fill="#7fa874" style="animation-duration:9.9s;animation-delay:-6.7s"/><circle class="p" cx="872" cy="251" r="3.4" fill="#f0a04b" style="animation-duration:13.8s;animation-delay:-10.1s"/><circle class="p" cx="1158" cy="173" r="2.2" fill="#7fa874" style="animation-duration:8.5s;animation-delay:-3.5s"/><circle class="p" cx="1189" cy="296" r="1.5" fill="#7fa874" style="animation-duration:12.6s;animation-delay:-3.2s"/><circle class="p" cx="807" cy="271" r="1.2" fill="#f0a04b" style="animation-duration:13.8s;animation-delay:-9.2s"/><circle class="p" cx="813" cy="324" r="1.2" fill="#7fa874" style="animation-duration:10.8s;animation-delay:-10.0s"/><circle class="p" cx="1181" cy="185" r="2.9" fill="#7fa874" style="animation-duration:7.5s;animation-delay:-4.4s"/><circle class="p" cx="639" cy="161" r="1.9" fill="#f0a04b" style="animation-duration:7.8s;animation-delay:-10.5s"/><circle class="p" cx="713" cy="376" r="2.0" fill="#7fa874" style="animation-duration:13.8s;animation-delay:-8.0s"/><circle class="p" cx="200" cy="300" r="3.2" fill="#7fa874" style="animation-duration:7.8s;animation-delay:-10.6s"/><circle class="p" cx="260" cy="221" r="1.1" fill="#f0a04b" style="animation-duration:13.2s;animation-delay:-9.3s"/><circle class="p" cx="55" cy="329" r="2.1" fill="#7fa874" style="animation-duration:12.0s;animation-delay:-5.9s"/><circle class="p" cx="1055" cy="184" r="3.1" fill="#7fa874" style="animation-duration:9.4s;animation-delay:-0.0s"/><circle class="p" cx="1010" cy="294" r="1.3" fill="#f0a04b" style="animation-duration:10.2s;animation-delay:-5.2s"/><circle class="p" cx="184" cy="164" r="2.0" fill="#7fa874" style="animation-duration:13.0s;animation-delay:-4.3s"/><circle class="p" cx="624" cy="235" r="2.6" fill="#7fa874" style="animation-duration:8.0s;animation-delay:-0.6s"/><circle class="p" cx="80" cy="209" r="2.7" fill="#f0a04b" style="animation-duration:11.6s;animation-delay:-1.6s"/>
+<text x="72" y="97.7" class="e">CAMPGROUND INCIDENT REPORTS</text>
+<text x="72" y="168" font-size="74" class="t" style="animation-delay:0.15s">THE CAMPSITE</text><text x="72" y="240.51999999999998" font-size="74" class="t" style="animation-delay:0.35s">HAS QUESTIONS</text>
+<rect class="u" x="72" y="262.52" width="502" height="3" fill="#f0a04b"/>
+<text x="72" y="298.52" class="g">Inspect the evidence, hear the campers out, rebuild what happened.</text>
+</svg>
