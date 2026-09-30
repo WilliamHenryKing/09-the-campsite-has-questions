@@ -8,6 +8,7 @@ interface Props {
   def: CaseDef;
   found: string[];
   heard: CharacterId[];
+  hidden?: boolean;
   onInspect: (clueId: string) => void;
   onTalk: (c: CharacterId) => void;
 }
@@ -16,7 +17,7 @@ interface Props {
  * Evidence and camper tags pinned over the 3D scene. They are real buttons, so every clue
  * is reachable by Tab and never needs pixel hunting.
  */
-export function Tags({ scene, def, found, heard, onInspect, onTalk }: Props) {
+export function Tags({ scene, def, found, heard, hidden = false, onInspect, onTalk }: Props) {
   const refs = useRef(new Map<string, HTMLButtonElement>());
 
   useEffect(
@@ -25,7 +26,7 @@ export function Tags({ scene, def, found, heard, onInspect, onTalk }: Props) {
         for (const a of anchors) {
           const el = refs.current.get(a.id);
           if (!el) continue;
-          el.style.transform = `translate(${a.x}px, ${a.y}px) translate(-50%, -100%)`;
+          el.style.transform = `translate(${Math.round(a.x)}px, ${Math.round(a.y)}px) translate(-50%, -100%)`;
           el.style.visibility = a.onScreen ? "visible" : "hidden";
         }
       }),
@@ -40,7 +41,7 @@ export function Tags({ scene, def, found, heard, onInspect, onTalk }: Props) {
   const talkers = def.statements.map((s) => s.character);
 
   return (
-    <div className="tags">
+    <div className="tags" hidden={hidden} inert={hidden} aria-hidden={hidden || undefined}>
       {def.clues.map((c) => {
         const seen = found.includes(c.id);
         return (
@@ -66,7 +67,7 @@ export function Tags({ scene, def, found, heard, onInspect, onTalk }: Props) {
           type="button"
           className={`tag tag-talk ${heard.includes(id) ? "is-seen" : ""}`}
           onClick={() => onTalk(id)}
-          aria-label={`Talk to ${CAST[id].name}`}
+          aria-label={`Talk to ${CAST[id].name}${heard.includes(id) ? " (statement heard)" : ""}`}
         >
           <span className="tag-mark" aria-hidden="true">
             “

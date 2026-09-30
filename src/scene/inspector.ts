@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { disposeTree } from "./resources";
 import { sample } from "./samples";
 
 // The evidence turntable: a separate little scene holding one sample the player can turn.
@@ -24,7 +25,7 @@ export class Inspector {
   }
 
   show(id: string) {
-    this.holder.clear();
+    disposeTree(this.holder);
     const s = sample(id);
     this.holder.add(s);
     this.yaw = 0.6;

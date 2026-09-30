@@ -5,7 +5,7 @@ import { rain } from "../effects";
 import { C } from "../palette";
 import { flatPatch, puddle } from "../smallProps";
 import { place, type World } from "../world";
-import { faceFront, type Stage, v, walk } from "./stage";
+import { faceFront, type Stage, selectedCause, v, walk } from "./stage";
 
 // Case 2: nobody stole the tent. Gus is wearing it.
 
@@ -82,21 +82,26 @@ export const tentStage: Stage = {
     });
   },
 
-  event(w, id, tl) {
+  event(w, id, tl, context) {
     const m = marks;
     if (!m) return;
     const gus = w.cast.gus;
+    const cause = selectedCause(context, "poncho");
     if (id === "rain") {
       tl.add(() => {
         m.rain.visible = true;
         // The patch only stays dry if the tent is still standing over it.
-        m.dry.visible = w.tent.visible;
+        m.dry.visible =
+          w.tent.visible &&
+          w.tent.position.y === 0 &&
+          w.tent.position.x === PITCH.x &&
+          w.tent.position.z === PITCH.z;
         cue("cloth");
       });
       const wet = new THREE.Color(C.grassWet);
       tl.to(w.ground.color, { r: wet.r, g: wet.g, b: wet.b, duration: 1.4 });
     } else if (id === "pegs") {
-      walk(tl, gus.root, v(PITCH.x - 0.4, 0, PITCH.z + 1.3), 0.8);
+      if (cause === "poncho") walk(tl, gus.root, v(PITCH.x - 0.4, 0, PITCH.z + 1.3), 0.8);
       w.pegs.children.forEach((peg, i) => {
         tl.add(() => cue("peg"), i ? "<0.15" : ">");
         tl.to(
@@ -111,20 +116,31 @@ export const tentStage: Stage = {
         );
         tl.to(peg.rotation, { z: Math.PI / 2, duration: 0.3 }, "<");
       });
-      tl.to(w.tent.scale, { x: 0.01, y: 0.01, z: 0.01, duration: 0.5, ease: "back.in" });
-      tl.add(() => {
-        w.tent.visible = false;
-        gus.cape.visible = true;
-        cue("cloth");
-      });
-      tl.fromTo(
-        gus.cape.scale,
-        { x: 0.2, y: 0.2, z: 0.2 },
-        { x: 1, y: 1, z: 1, duration: 0.4, ease: "back.out" },
-      );
-      faceFront(tl, gus.root);
+      if (cause === "wind") {
+        tl.to(w.tent.position, { y: 0.5, duration: 0.5 });
+        tl.to(w.tent.rotation, { z: 0.2, duration: 0.5 }, "<");
+      } else {
+        tl.to(w.tent.scale, { x: 0.01, y: 0.01, z: 0.01, duration: 0.5, ease: "back.in" });
+        tl.add(() => {
+          w.tent.visible = false;
+          cue("cloth");
+        });
+      }
+      if (cause === "poncho") {
+        tl.set(gus.cape, { visible: true });
+        tl.fromTo(
+          gus.cape.scale,
+          { x: 0.2, y: 0.2, z: 0.2 },
+          { x: 1, y: 1, z: 1, duration: 0.4, ease: "back.out" },
+        );
+        faceFront(tl, gus.root);
+      }
     } else if (id === "kettle") {
-      walk(tl, gus.root, v(-0.9, 0, 2.5), 1.1);
+      if (cause === "poncho") walk(tl, gus.root, v(-0.9, 0, 2.5), 1.1);
+      else if (cause === "wind") {
+        tl.to(w.tent.position, { x: -0.9, y: 0.5, z: 2.5, duration: 1.1 });
+        tl.to(w.tent.rotation, { z: 0.8, duration: 1.1 }, "<");
+      }
       tl.to(w.kettle.position, {
         x: KETTLE_TIPPED.x,
         y: KETTLE_TIPPED.y,
@@ -137,23 +153,28 @@ export const tentStage: Stage = {
         cue("kettle");
       });
       tl.fromTo(m.puddle.scale, { x: 0.1, y: 0.1 }, { x: 1, y: 0.6, duration: 0.5 });
-      walk(tl, gus.root, v(-0.3, 0, 2.3), 0.4);
-      faceFront(tl, gus.root);
+      if (cause === "poncho") {
+        walk(tl, gus.root, v(-0.3, 0, 2.3), 0.4);
+        faceFront(tl, gus.root);
+      }
     }
   },
 
-  explain(w, id, tl) {
+  explain(w, id, tl, context) {
     const gus = w.cast.gus;
     if (id === "poncho") {
       tl.add(() => cue("cloth"));
       tl.to(gus.root.rotation, { y: "+=6.283", duration: 0.9, ease: "power2.inOut" });
       tl.to(gus.cape.scale, { x: 1.25, z: 1.25, duration: 0.3, yoyo: true, repeat: 1 }, "<0.2");
     } else {
-      const flyer = w.tent.clone();
-      flyer.visible = true;
-      flyer.scale.setScalar(1);
-      place(flyer, PITCH.x, 0, PITCH.z, PITCH_RY);
-      w.extras.add(flyer);
+      const staged = context?.mode === "test";
+      const flyer = staged ? w.tent : w.tent.clone();
+      if (!staged) {
+        flyer.visible = true;
+        flyer.scale.setScalar(1);
+        place(flyer, PITCH.x, 0, PITCH.z, PITCH_RY);
+        w.extras.add(flyer);
+      }
       tl.add(() => cue("cloth"));
       tl.to(flyer.position, { x: 4.6, y: 2.4, z: 2.5, duration: 1.1, ease: "power1.out" });
       tl.to(flyer.rotation, { x: 1.2, z: 0.8, duration: 1.1 }, "<");

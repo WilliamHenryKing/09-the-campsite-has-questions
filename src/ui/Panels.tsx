@@ -52,11 +52,11 @@ interface InspectProps {
 
 export function InspectPanel({ clue, onTurn, onClose }: InspectProps) {
   const step = 0.4;
-  const focus = useAutoFocus<HTMLButtonElement>();
+  const focus = useAutoFocus<HTMLHeadingElement>();
   return (
     <section className="paper sheet inspect" aria-labelledby="inspect-title">
       <p className="form-kicker">Evidence</p>
-      <h2 id="inspect-title" className="sheet-title">
+      <h2 id="inspect-title" className="sheet-title" tabIndex={-1} ref={focus}>
         {clue.name}
       </h2>
       <p className="fact">{clue.fact}</p>
@@ -95,7 +95,7 @@ export function InspectPanel({ clue, onTurn, onClose }: InspectProps) {
         </button>
         <span className="small">or drag it</span>
       </fieldset>
-      <button type="button" className="btn btn-primary" onClick={onClose} ref={focus}>
+      <button type="button" className="btn btn-primary" onClick={onClose}>
         Back to camp
       </button>
     </section>
@@ -110,7 +110,7 @@ interface TalkProps {
 }
 
 export function TalkPanel({ def, who, found, onClose }: TalkProps) {
-  const focus = useAutoFocus<HTMLButtonElement>();
+  const focus = useAutoFocus<HTMLHeadingElement>();
   const s = def.statements.find((x) => x.character === who);
   if (!s) return null;
   const disproof =
@@ -120,7 +120,7 @@ export function TalkPanel({ def, who, found, onClose }: TalkProps) {
   return (
     <section className="paper sheet talk" aria-labelledby="talk-title">
       <p className="form-kicker">Statement</p>
-      <h2 id="talk-title" className="sheet-title">
+      <h2 id="talk-title" className="sheet-title" tabIndex={-1} ref={focus}>
         {CAST[who].name} <span className="role">· {CAST[who].role}</span>
       </h2>
       <blockquote className={`bubble who-${who}`}>{s.text}</blockquote>
@@ -129,7 +129,7 @@ export function TalkPanel({ def, who, found, onClose }: TalkProps) {
           Doubtful: see {disproof.name}
         </p>
       )}
-      <button type="button" className="btn btn-primary" onClick={onClose} ref={focus}>
+      <button type="button" className="btn btn-primary" onClick={onClose}>
         Thank you
       </button>
     </section>

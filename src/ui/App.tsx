@@ -6,9 +6,11 @@ import { currentCase, initialState, reducer } from "../game/state";
 import type { CharacterId } from "../game/types";
 import { worldReady } from "../loader";
 import { CampScene } from "../scene/CampScene";
+import { type OpeningPhase, wantsTitle } from "../scene/opening";
 import { Board } from "./Board";
 import { MuteButton } from "./MuteButton";
-import { Hint, InspectPanel, IntroCard, TalkPanel } from "./Panels";
+import { Guide, Title } from "./Opening";
+import { InspectPanel, IntroCard, TalkPanel } from "./Panels";
 import { Replay } from "./Replay";
 import { Finale, ReportCard } from "./Report";
 import { Tags } from "./Tags";
@@ -18,15 +20,27 @@ import { useSoundscape } from "./useSoundscape";
 const reducedMotion = () =>
   typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+const GUIDE_KEY = "campsite-guide-v1";
+const initialGuide = () => {
+  try {
+    return localStorage.getItem(GUIDE_KEY) ? -1 : 0;
+  } catch {
+    return 0;
+  }
+};
+
 export function App() {
-  const [state, dispatch] = useReducer(reducer, undefined, initialState);
+  const [state, dispatch] = useReducer(reducer, undefined, () =>
+    wantsTitle ? initialState() : reducer(initialState(), { type: "begin" }),
+  );
+  const [opening, setOpening] = useState<OpeningPhase>(wantsTitle ? "title" : "done");
+  const [guide, setGuide] = useState(initialGuide);
   const def = currentCase(state);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [scene, setScene] = useState<CampScene | null>(null);
   const [inspecting, setInspecting] = useState<string | null>(null);
   const [talking, setTalking] = useState<CharacterId | null>(null);
   const [board, setBoard] = useState(false);
-  const [hint, setHint] = useState(true);
   const [report, setReport] = useState<{ image: string | null } | null>(null);
   const { replay, run, clear } = useReplay(scene);
   useSoundscape(def.time, replay !== null || report !== null);
@@ -35,6 +49,10 @@ export function App() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const s = new CampScene(canvas, reducedMotion());
+    s.opening.onDone = () => {
+      setOpening("done");
+      dispatch({ type: "begin" });
+    };
     s.onFirstFrame(worldReady);
     const ro = new ResizeObserver(() => s.resize());
     if (canvas.parentElement) ro.observe(canvas.parentElement);
@@ -60,7 +78,7 @@ export function App() {
   const openInspect = (id: string) => {
     setTalking(null);
     setBoard(false);
-    setHint(false);
+    setGuide((g) => (g === 0 ? 1 : g));
     sound.play("pickup");
     setInspecting(id);
     dispatch({ type: "inspect", clueId: id });
@@ -69,10 +87,12 @@ export function App() {
     setInspecting(null);
     sound.play("talk");
     setTalking(id);
+    setGuide((g) => (g === 2 ? 3 : g));
     dispatch({ type: "talk", character: id });
   };
 
   const test = async () => {
+    if (guide === 3) skipGuide();
     setBoard(false);
     sound.play("click");
     dispatch({ type: "tested" });
@@ -96,7 +116,8 @@ export function App() {
     }
     setBoard(false);
     const all = def.clues.map((c) => c.id);
-    await run(def, def.truth, all, "payoff");
+    const finished = await run(def, def.truth, all, "payoff");
+    if (!finished) return;
     setReport({ image: scene?.snapshot() ?? null });
     clear();
   };
@@ -110,8 +131,26 @@ export function App() {
   const investigating = state.phase === "investigate" || (state.phase === "report" && !report);
   const panelOpen = inspecting !== null || talking !== null || board;
 
+  const skipGuide = () => {
+    setGuide(-1);
+    try {
+      localStorage.setItem(GUIDE_KEY, "seen");
+    } catch {
+      /* Storage is optional. */
+    }
+  };
+  const turn = useCallback(
+    (x: number, y: number) => {
+      scene?.turn(x, y);
+      if (inspecting) setGuide((g) => (g === 1 ? 2 : g));
+    },
+    [scene, inspecting],
+  );
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (opening !== "done" || !investigating || replay) return;
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (e.key === "Escape") {
         setInspecting(null);
@@ -119,7 +158,7 @@ export function App() {
         setBoard(false);
         return;
       }
-      if (tag === "INPUT" || !scene) return;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || !scene) return;
       const turns: Record<string, [number, number]> = {
         ArrowLeft: [-0.15, 0],
         ArrowRight: [0.15, 0],
@@ -128,8 +167,9 @@ export function App() {
       };
       const t = turns[e.key];
       if (t) {
+        if (board || talking) return;
         e.preventDefault();
-        scene.turn(t[0], t[1]);
+        turn(t[0], t[1]);
       } else if ((e.key === "b" || e.key === "B") && state.phase === "investigate" && !replay) {
         setInspecting(null);
         setTalking(null);
@@ -141,18 +181,26 @@ export function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [scene, state.phase, replay]);
+  }, [scene, state.phase, replay, opening, investigating, turn, board, talking]);
 
   const drag = useRef<{ x: number; y: number; id: number } | null>(null);
   const onPointerDown = (e: React.PointerEvent) => {
-    if (e.target !== canvasRef.current) return;
+    if (
+      opening !== "done" ||
+      !investigating ||
+      replay ||
+      board ||
+      talking ||
+      e.target !== canvasRef.current
+    )
+      return;
     drag.current = { x: e.clientX, y: e.clientY, id: e.pointerId };
     canvasRef.current?.setPointerCapture(e.pointerId);
   };
   const onPointerMove = (e: React.PointerEvent) => {
     const d = drag.current;
     if (!d || d.id !== e.pointerId || !scene) return;
-    scene.turn((e.clientX - d.x) * 0.006, (e.clientY - d.y) * 0.006);
+    turn((e.clientX - d.x) * 0.006, (e.clientY - d.y) * 0.006);
     if (inspecting) sound.play("turn", { volume: 0.5, gap: 0.25 });
     d.x = e.clientX;
     d.y = e.clientY;
@@ -183,8 +231,9 @@ export function App() {
               : `The campground: ${def.title}. Drag or use the arrow keys to look around.`
           }
         />
-        {scene && investigating && !replay && !inspecting && (
+        {scene && opening === "done" && investigating && (
           <Tags
+            hidden={panelOpen || !!replay}
             scene={scene}
             def={def}
             found={state.found}
@@ -195,7 +244,7 @@ export function App() {
         )}
       </div>
 
-      {state.phase !== "intro" && state.phase !== "finale" && !report && (
+      {opening === "done" && state.phase !== "intro" && state.phase !== "finale" && !report && (
         <header className="hud">
           <p className="hud-case">
             <span className="hud-no">No. {def.number}</span> {def.title}
@@ -207,11 +256,45 @@ export function App() {
         </header>
       )}
 
+      {opening === "title" && (
+        <Title
+          def={def}
+          onBegin={() => {
+            if (!scene) return;
+            sound.play("begin");
+            setOpening(reducedMotion() ? "done" : "glide");
+            scene.opening.begin(reducedMotion());
+          }}
+        />
+      )}
+      {opening === "done" && state.phase === "investigate" && !replay && guide >= 0 && (
+        <Guide step={guide} panelOpen={panelOpen} onSkip={skipGuide} />
+      )}
+      {opening === "done" &&
+        state.phase === "investigate" &&
+        !replay &&
+        !panelOpen &&
+        guide < 0 && (
+          <button
+            className="guide-replay"
+            type="button"
+            aria-label="Replay the guide"
+            onClick={() => {
+              setInspecting(null);
+              setTalking(null);
+              setBoard(false);
+              setGuide(0);
+            }}
+          >
+            ?
+          </button>
+        )}
+
       {scene && !scene.webgl && (
         <p className="nogl">The 3D view needs WebGL; the tags and board still work.</p>
       )}
 
-      {state.phase === "intro" && (
+      {opening === "done" && state.phase === "intro" && (
         <IntroCard
           def={def}
           onBegin={() => {
@@ -223,14 +306,6 @@ export function App() {
 
       {state.phase === "investigate" && !replay && !panelOpen && (
         <div className="dock">
-          {state.caseIndex === 0 && hint && (
-            <Hint
-              onClose={() => {
-                sound.play("click");
-                setHint(false);
-              }}
-            />
-          )}
           <button
             type="button"
             className="btn btn-primary btn-board"
@@ -250,7 +325,7 @@ export function App() {
           clue={clue}
           onTurn={(x, y) => {
             sound.play("turn");
-            scene?.turn(x, y);
+            turn(x, y);
           }}
           onClose={() => {
             sound.play("click");

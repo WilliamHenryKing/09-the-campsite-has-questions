@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { sharedMaterial } from "./resources";
 
 // One muted, sun-faded palette shared by every prop so the diorama reads as a single illustration.
 export const C = {
@@ -35,12 +36,14 @@ export function mat(color: number, opts: { flat?: boolean; rough?: number } = {}
   const key = `${color}:${opts.flat ?? false}:${opts.rough ?? 0.85}`;
   let m = cache.get(key);
   if (!m) {
-    m = new THREE.MeshStandardMaterial({
-      color,
-      roughness: opts.rough ?? 0.85,
-      metalness: 0,
-      flatShading: opts.flat ?? false,
-    });
+    m = sharedMaterial(
+      new THREE.MeshStandardMaterial({
+        color,
+        roughness: opts.rough ?? 0.85,
+        metalness: 0,
+        flatShading: opts.flat ?? false,
+      }),
+    );
     cache.set(key, m);
   }
   return m;

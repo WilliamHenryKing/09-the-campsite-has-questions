@@ -4,7 +4,7 @@ import { cue } from "../cues";
 import { C, mat, mesh } from "../palette";
 import { drip, groovePair, revealTrail, trail } from "../smallProps";
 import { lieDown, place, type World } from "../world";
-import { faceFront, type Stage, v, walk } from "./stage";
+import { faceFront, type Stage, selectedCause, v, walk } from "./stage";
 
 // Case 1: the picnic crept across camp after the shade.
 
@@ -85,9 +85,10 @@ export const picnicStage: Stage = {
     place(w.cast.pip.root, 1.7, 0, 2.1);
   },
 
-  event(w, id, tl) {
+  event(w, id, tl, context) {
     const m = marks;
     if (!m) return;
+    const cause = selectedCause(context, "shade");
     if (id === "nap") {
       tl.add(() => {
         w.sleep("marge", true);
@@ -103,7 +104,7 @@ export const picnicStage: Stage = {
       tl.to(w.book.rotation, { y: 0.7, z: 0.4, duration: 0.35, yoyo: true, repeat: 1 }, "<");
     } else if (id === "chair") {
       const pip = w.cast.pip.root;
-      walk(tl, pip, v(0.9, 0, 1.9), 0.5);
+      if (cause === "shade") walk(tl, pip, v(0.9, 0, 1.9), 0.5);
       tl.add(() => cue("creak"));
       const p = { t: 0 };
       tl.to(p, {
@@ -115,8 +116,10 @@ export const picnicStage: Stage = {
           const tan = m.groove.getTangentAt(p.t);
           w.chair.position.copy(at);
           w.chair.rotation.y = Math.atan2(-tan.x, -tan.z);
-          pip.position.set(at.x - tan.x * 0.7, 0, at.z - tan.z * 0.7);
-          pip.rotation.y = Math.atan2(tan.x, tan.z);
+          if (cause === "shade") {
+            pip.position.set(at.x - tan.x * 0.7, 0, at.z - tan.z * 0.7);
+            pip.rotation.y = Math.atan2(tan.x, tan.z);
+          }
           revealTrail(m.grooves, p.t);
         },
       });
@@ -124,7 +127,16 @@ export const picnicStage: Stage = {
       tl.add(() => cue("creak"));
     } else if (id === "basket") {
       const pip = w.cast.pip.root;
-      walk(tl, pip, v(0.1, 0, 1.2), 0.7);
+      let carrier: THREE.Object3D | null = cause === "shade" ? pip : null;
+      if (cause === "raccoon") {
+        carrier = raccoon();
+        carrier.name = "reconstruction-raccoon";
+        place(carrier, -6.5, 0, 3);
+        w.extras.add(carrier);
+        walk(tl, carrier, v(0.1, 0, 1.2), 1.0);
+      } else if (carrier) {
+        walk(tl, carrier, v(0.1, 0, 1.2), 0.7);
+      }
       const p = { t: 0 };
       tl.to(p, {
         t: 1,
@@ -133,8 +145,10 @@ export const picnicStage: Stage = {
         onUpdate: () => {
           const at = m.drip.getPointAt(p.t);
           const tan = m.drip.getTangentAt(p.t);
-          pip.position.set(at.x, 0, at.z);
-          pip.rotation.y = Math.atan2(tan.x, tan.z);
+          if (carrier) {
+            carrier.position.set(at.x, 0, at.z);
+            carrier.rotation.y = Math.atan2(tan.x, tan.z);
+          }
           w.basket.position.set(at.x + 0.25, 0.45, at.z);
           w.jug.position.set(at.x - 0.25, 0.45, at.z);
           w.blanket.position.set(at.x, 0.7, at.z);
@@ -146,12 +160,14 @@ export const picnicStage: Stage = {
       tl.to(w.jug.position, { x: SHADE.jug.x, y: 0, z: SHADE.jug.z, duration: 0.4 }, "<");
       tl.to(w.blanket.position, { x: SHADE.basket.x, y: 0, z: SHADE.basket.z, duration: 0.5 }, "<");
       tl.to(w.blanket.scale, { x: 1, y: 1, z: 1, duration: 0.5 }, "<");
-      walk(tl, pip, SHADE.pip, 0.3);
-      faceFront(tl, pip);
+      if (cause === "shade") {
+        walk(tl, pip, SHADE.pip, 0.3);
+        faceFront(tl, pip);
+      }
     }
   },
 
-  explain(w, id, tl) {
+  explain(w, id, tl, context) {
     if (id === "shade") {
       const pip = w.cast.pip.root;
       walk(tl, pip, v(SHADE.chair.x, 0.25, SHADE.chair.z + 0.05), 0.5);
@@ -159,12 +175,20 @@ export const picnicStage: Stage = {
       tl.add(() => cue("cloth"));
       tl.to(w.cast.pip.body.scale, { x: 1.12, y: 0.9, duration: 0.3, yoyo: true, repeat: 1 });
     } else {
-      const r = raccoon();
-      place(r, -6.5, 0, 3);
-      w.extras.add(r);
-      walk(tl, r, v(0.6, 0.85, 0.4), 1.0);
+      // Continue the chosen theft instead of adding a raccoon after Pip has moved the picnic.
+      const staged = context?.mode === "test" && w.extras.getObjectByName("reconstruction-raccoon");
+      const r = staged || raccoon();
+      if (!staged) {
+        place(r, -6.5, 0, 3);
+        w.extras.add(r);
+        walk(tl, r, v(0.6, 0.85, 0.4), 1.0);
+      }
       tl.to(r.rotation, { y: "+=6.28", duration: 0.5 });
       walk(tl, r, v(6.5, 0, -2.5), 0.9);
+      if (staged) {
+        tl.to(w.basket.position, { x: 6.75, y: 0.45, z: -2.5, duration: 0.9 }, "<");
+        tl.set(w.basket, { visible: false });
+      }
       tl.set(r, { visible: false });
     }
   },

@@ -1,0 +1,220 @@
+.opening {
+  overflow-y: auto;
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  padding: 7vw;
+  color: #fff4da;
+  background: linear-gradient(90deg, #182c27e8 0%, #21392ab0 33%, #243d2910 70%);
+}
+.opening-copy {
+  max-width: 650px;
+}
+.opening-eyebrow {
+  font: 700 10px / 1.6 var(--type);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.opening h1 {
+  margin: 22px 0;
+  font:
+    500 clamp(44px, 5.4vw, 86px) / 0.99 Georgia,
+    serif;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+.opening h1 em {
+  color: #ecc57e;
+  font-weight: 400;
+}
+.opening-premise {
+  font-size: clamp(16px, 1.45vw, 21px);
+  line-height: 1.65;
+  margin: 0 0 32px;
+}
+.opening-button {
+  min-height: 52px;
+  padding: 0 25px;
+  background: #f3ddb1;
+  color: #26362a;
+  border: 1px solid #fff6d7;
+  border-radius: 4px;
+  font: 700 14px var(--type);
+  cursor: pointer;
+}
+.opening-button:hover {
+  background: #fff2d4;
+}
+.enter-note {
+  display: block;
+  margin-top: 13px;
+  font: 11px var(--type);
+  opacity: 0.7;
+}
+.opening-incident {
+  max-width: 420px;
+  font: 12px / 1.55 var(--type);
+  margin: -12px 0 24px;
+  color: #f0dfbd;
+}
+.opening-incident strong {
+  color: #f4cc86;
+}
+.rise {
+  animation: case-rise 1s both;
+}
+.rise:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.rise:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.rise:nth-child(4) {
+  animation-delay: 0.45s;
+}
+.rise:nth-child(5) {
+  animation-delay: 0.6s;
+}
+@keyframes case-rise {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+}
+.case-guide {
+  position: absolute;
+  z-index: 3;
+  left: 22px;
+  bottom: 22px;
+  width: min(340px, calc(100vw - 44px));
+  padding: 18px 20px 12px;
+  border: 1px solid #e6d5b0;
+  border-top: 4px solid #9d4e34;
+  border-radius: 4px;
+  background: #f7f0dff5;
+  box-shadow: 0 8px 30px #17271b30;
+}
+.case-guide p {
+  margin: 0 0 9px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.case-guide .opening-eyebrow {
+  font-size: 10px;
+  color: #85452f;
+}
+.guide-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #885235;
+  font-size: 11px;
+}
+.guide-foot button {
+  background: none;
+  border: 0;
+  padding: 10px 0 10px 10px;
+  text-decoration: underline;
+  cursor: pointer;
+  color: var(--ink-soft);
+}
+.guide-replay {
+  position: absolute;
+  top: 64px;
+  right: 18px;
+  z-index: 3;
+  border: 1px solid #d8c9a8;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--paper);
+  cursor: pointer;
+  font:
+    700 17px Georgia,
+    serif;
+}
+@media (max-width: 700px) {
+  .opening {
+    align-items: flex-start;
+    padding: max(60px, 9vh) 27px 24px;
+    background: linear-gradient(180deg, #182c27eb 0%, #233d2ca8 38%, #263f2b00 77%);
+  }
+  .opening h1 {
+    margin: 16px 0;
+    font-size: clamp(39px, 11vw, 65px);
+  }
+  .opening-eyebrow {
+    max-width: 245px;
+    font-size: 9px;
+  }
+  .opening-premise {
+    font-size: 15px;
+    line-height: 1.45;
+    margin-bottom: 21px;
+  }
+  .opening-button {
+    min-height: 48px;
+  }
+  .opening-incident {
+    font-size: 10px;
+    margin: -5px 0 18px;
+    max-width: 320px;
+  }
+  .enter-note {
+    display: none;
+  }
+  .case-guide {
+    left: 12px;
+    bottom: auto;
+    top: 100px;
+    width: calc(100vw - 24px);
+    padding: 10px 14px 3px;
+  }
+  .case-guide p {
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+  .case-guide .opening-eyebrow {
+    max-width: none;
+  }
+  .case-guide.is-panel-open {
+    max-height: max(84px, calc(40dvh - 116px));
+    overflow-y: auto;
+  }
+}
+@media (max-height: 550px) {
+  .opening {
+    align-items: flex-start;
+    padding: 32px 6vw;
+  }
+  .opening h1 {
+    font-size: 48px;
+    margin: 12px 0;
+  }
+  .opening-premise {
+    margin-bottom: 16px;
+  }
+  .case-guide {
+    padding: 10px 14px 3px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
+}
+@media (max-height: 550px) and (max-width: 700px) {
+  .app:has(.case-guide) .hud-count {
+    display: none;
+  }
+  .case-guide {
+    top: 56px;
+    max-height: calc(100dvh - 128px);
+    overflow-y: auto;
+  }
+  .case-guide.is-panel-open {
+    max-height: calc(40dvh - 80px);
+  }
+}

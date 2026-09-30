@@ -16,6 +16,7 @@ import {
   tent,
   windsock,
 } from "./props";
+import { disposeTree, resourcesOf, type SceneResources } from "./resources";
 import { basket, blanket, book, jug, pegs } from "./smallProps";
 
 /**
@@ -46,6 +47,7 @@ export class World {
     pip: character("pip"),
   };
   private hammockMesh: THREE.Group | null = null;
+  private persistent: SceneResources;
 
   constructor() {
     this.root.add(island(this.ground));
@@ -92,13 +94,14 @@ export class World {
       this.extras,
     );
     for (const c of Object.values(this.cast)) this.root.add(c.root);
+    this.persistent = resourcesOf(this.root);
   }
 
   /** Re-sling the hammock between two points, or remove it. */
   setHammock(a: THREE.Vector3 | null, b?: THREE.Vector3, sag = 0.45) {
     if (this.hammockMesh) {
       this.root.remove(this.hammockMesh);
-      for (const m of this.hammockMesh.children) (m as THREE.Mesh).geometry.dispose();
+      disposeTree(this.hammockMesh, { preserve: this.persistent });
       this.hammockMesh = null;
     }
     if (a && b) {
@@ -113,7 +116,7 @@ export class World {
 
   /** Put every movable object back to a neutral pose before a case arranges them. */
   reset() {
-    this.extras.clear();
+    disposeTree(this.extras, { preserve: this.persistent });
     this.setHammock(null);
     const movable: THREE.Object3D[] = [
       this.table,

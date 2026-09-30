@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { C, group, mat, mesh } from "./palette";
+import { sharedMaterial } from "./resources";
 
 // Small movable evidence: baskets, books, pegs, and the marks things leave on the ground.
 
@@ -85,7 +86,9 @@ export function revealTrail(g: THREE.Group, fraction: number) {
   });
 }
 
-const dripMat = new THREE.MeshStandardMaterial({ color: C.lemonade, roughness: 0.15 });
+const dripMat = sharedMaterial(
+  new THREE.MeshStandardMaterial({ color: C.lemonade, roughness: 0.15 }),
+);
 
 /** A flat splash, wrapped in a group so trails can turn it without tipping it on edge. */
 export function drip(): THREE.Group {

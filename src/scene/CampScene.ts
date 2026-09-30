@@ -6,9 +6,11 @@ import { muteCues } from "./cues";
 import { pulseRing } from "./effects";
 import { Inspector } from "./inspector";
 import { Lighting } from "./lighting";
+import { Opening } from "./opening";
+import { disposeTree } from "./resources";
 import { bellStage } from "./stages/bell";
 import { picnicStage } from "./stages/picnic";
-import type { Stage } from "./stages/stage";
+import type { ReconstructionContext, Stage } from "./stages/stage";
 import { tentStage } from "./stages/tent";
 import { World } from "./world";
 
@@ -27,6 +29,7 @@ const box = new THREE.Box3();
 
 /** Owns the renderer, camera and loop; the UI talks to it through a handful of verbs. */
 export class CampScene {
+  readonly opening = new Opening();
   private renderer: THREE.WebGLRenderer | null = null;
   private scene = new THREE.Scene();
   private camera = new THREE.PerspectiveCamera(38, 1, 0.5, 120);
@@ -41,6 +44,9 @@ export class CampScene {
   private timer = new THREE.Timer();
   private frame = 0;
   private running: gsap.core.Timeline | null = null;
+  private settlePlayback: (() => void) | null = null;
+  private holdTimer: number | null = null;
+  private reconstruction: ReconstructionContext = { mode: "payoff", explanation: null };
   private listeners: ((a: Anchor[]) => void)[] = [];
   private firstFrame: (() => void) | null = null;
   private width = 1;
@@ -107,18 +113,19 @@ export class CampScene {
     this.pitch = THREE.MathUtils.clamp(this.pitch - dy * 0.6, 0.55, 1.0);
   }
 
-  beginReconstruction() {
+  beginReconstruction(context?: ReconstructionContext) {
     this.stop();
+    this.reconstruction = context ?? { mode: "payoff", explanation: null };
     this.world.reset();
     this.stage.before(this.world);
   }
 
   playEvent(id: string) {
-    return this.play((tl) => this.stage.event(this.world, id, tl));
+    return this.play((tl) => this.stage.event(this.world, id, tl, this.reconstruction));
   }
 
   playExplanation(id: string) {
-    return this.play((tl) => this.stage.explain(this.world, id, tl));
+    return this.play((tl) => this.stage.explain(this.world, id, tl, this.reconstruction));
   }
 
   /** Point at the evidence that disagrees with the replay. */
@@ -151,6 +158,11 @@ export class CampScene {
   dispose() {
     cancelAnimationFrame(this.frame);
     this.stop();
+    this.listeners = [];
+    this.firstFrame = null;
+    this.opening.onDone = null;
+    this.timer.dispose();
+    disposeTree([this.scene, this.inspector.scene], { includeSharedMaterials: true });
     this.renderer?.dispose();
   }
 
@@ -160,17 +172,31 @@ export class CampScene {
     build(tl);
     this.running = tl;
     return new Promise((resolve) => {
+      const finish = () => {
+        if (this.settlePlayback !== finish) return;
+        this.settlePlayback = null;
+        if (this.holdTimer !== null) window.clearTimeout(this.holdTimer);
+        this.holdTimer = null;
+        this.running = null;
+        tl.kill();
+        resolve();
+      };
+      this.settlePlayback = finish;
       if (this.reducedMotion) {
         // Jump to the outcome, then hold it long enough to read.
         muteCues(true);
         tl.progress(1);
         muteCues(false);
-        window.setTimeout(resolve, 650);
+        this.holdTimer = window.setTimeout(finish, 650);
         return;
       }
-      tl.eventCallback("onComplete", () => resolve());
+      tl.eventCallback("onComplete", finish);
       tl.play();
     });
+  }
+
+  cancelPlayback() {
+    this.stop();
   }
 
   private stop() {
@@ -181,6 +207,7 @@ export class CampScene {
       muteCues(false);
       this.running = null;
     }
+    this.settlePlayback?.();
   }
 
   private loop = () => {
@@ -189,7 +216,10 @@ export class CampScene {
     const dt = Math.min(this.timer.getDelta(), 0.05);
     const t = this.timer.getElapsed();
     this.placeCamera();
-    for (const c of this.world.extras.children) c.userData.update?.(dt);
+    this.opening.update(this.camera, dt, this.reducedMotion);
+    if (!this.reducedMotion) {
+      for (const c of this.world.extras.children) c.userData.update?.(dt);
+    }
     if (!this.reducedMotion) this.idle(t);
     this.inspector.update(dt, this.reducedMotion);
     if (this.renderer) {
@@ -205,6 +235,10 @@ export class CampScene {
   };
 
   private placeCamera() {
+    if (this.camera.fov !== 38) {
+      this.camera.fov = 38;
+      this.camera.updateProjectionMatrix();
+    }
     const r = this.radius;
     this.camera.position.set(
       TARGET.x + r * Math.sin(this.pitch) * Math.sin(this.yaw),

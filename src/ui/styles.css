@@ -6,11 +6,11 @@
   --rule: #e2d5b8;
   --ink: #2b2a33;
   --ink-soft: #5d5866;
-  --red: #c4473b;
-  --green: #3f7a57;
-  --amber: #b8801f;
+  --red: #b83f34;
+  --green: #3e7755;
+  --amber: #805600;
   --moss: #4f7a5a;
-  --focus: #e0702f;
+  --focus: #aa4714;
   --shadow: 0 1px 0 #fff8 inset, 0 10px 30px #1d1a2440, 0 2px 6px #1d1a2430;
   --type: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
   color-scheme: light;
@@ -351,7 +351,7 @@ body {
 
 .sheet {
   position: absolute;
-  top: 16px;
+  top: max(68px, calc(env(safe-area-inset-top) + 56px));
   right: 16px;
   bottom: 16px;
   width: min(420px, calc(100% - 32px));
@@ -368,6 +368,7 @@ body {
 .inspect,
 .talk {
   bottom: auto;
+  max-height: calc(100dvh - max(68px, calc(env(safe-area-inset-top) + 56px)) - 16px);
 }
 
 .turns {

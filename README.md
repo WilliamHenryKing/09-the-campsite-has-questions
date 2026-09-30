@@ -16,7 +16,7 @@
 
 ## How to play
 
-1. **Read the incident form**, then press *Begin investigation*.
+1. **Open the casebook.** A camera tour introduces the camp and the first incident. The optional four-step guide follows your actions; replay it with **?**. Later incidents start with their own form.
 2. **Inspect evidence.** Every clue has a red **?** tag in the scene, so there is no pixel hunting. Pick up a sample and turn it by dragging, with the arrow keys or with the ◀ ▲ ▼ ▶ buttons.
 3. **Talk to the campers.** Tap a name tag to hear a statement. Some witnesses are confident and wrong; once you find the evidence against a statement, it is stamped *doubtful*.
 4. **Open the Incident Board** (button or `B`). Put the three events in order, then choose who did it and why.
@@ -34,9 +34,10 @@
 ## What's inside
 
 - **Three fair cases:** the picnic in the afternoon, the tent in the rain, the bell at dawn.
+- **A cinematic opening and interactive guide**, with a direct cut for reduced motion.
 - **Deduction by relationship:** one clue orders two events, a second orders another pair, the third decides the explanation. No single clue settles a case.
 - **Proof the puzzles are fair:** unit tests check that exactly one reconstruction survives all three clues.
-- **An animated replay** of your theory, stopped by the evidence it contradicts.
+- **An animated replay** of your selected theory, stopped by the evidence it contradicts. Unchosen causes do not reveal a culprit.
 - **An illustrated incident report** for every closed case.
 - **Sound for every beat:** a cosy score, per-case ambience (birds, rain, crickets at dawn) and effects that duck under reconstructions.
 - **Accessible by default:** keyboard throughout, and reduced motion jumps straight to each beat's outcome.

@@ -4,7 +4,7 @@ import { cue } from "../cues";
 import { C } from "../palette";
 import { groovePair, revealTrail, trail } from "../smallProps";
 import { lieDown, place, type World } from "../world";
-import { faceFront, ring, type Stage, v, walk } from "./stage";
+import { faceFront, ring, type Stage, selectedCause, v, walk } from "./stage";
 
 // Case 3: the "bear" was a hammock tied to the picnic table and the bell cord.
 
@@ -74,24 +74,34 @@ export const bellStage: Stage = {
     w.sleep("gus", true);
   },
 
-  event(w, id, tl) {
+  event(w, id, tl, context) {
     const marge = w.cast.marge.root;
+    const cause = selectedCause(context, "hammock");
     if (id === "tie") {
-      walk(tl, marge, v(1.6, 0, 1.2), 0.8);
+      if (cause === "hammock") walk(tl, marge, v(1.6, 0, 1.2), 0.8);
       tl.add(() => {
         sling(w);
         cue("cloth");
       });
-      tl.to(marge.scale, { y: 0.9, duration: 0.2, yoyo: true, repeat: 3 });
+      if (cause === "hammock") tl.to(marge.scale, { y: 0.9, duration: 0.2, yoyo: true, repeat: 3 });
     } else if (id === "dew") {
       const dew = new THREE.Color(C.grassDew);
       tl.to(w.ground.color, { r: dew.r, g: dew.g, b: dew.b, duration: 1.4 });
     } else if (id === "lurch") {
-      walk(tl, marge, v(2.4, 0, 1.2), 0.6);
-      tl.add(() => {
-        lieDown(marge, 2.95, 0.72, 0.55);
-        cue("creak");
-      });
+      if (cause === "hammock") {
+        walk(tl, marge, v(2.4, 0, 1.2), 0.6);
+        tl.add(() => {
+          lieDown(marge, 2.95, 0.72, 0.55);
+          cue("creak");
+        });
+      } else if (cause === "bear") {
+        const b = bear();
+        b.name = "reconstruction-bear";
+        place(b, -6.5, 0, -1.2);
+        w.extras.add(b);
+        walk(tl, b, v(-2.3, 0, 0.4), 1.2);
+        tl.add(() => cue("thud"));
+      }
       const p = { t: 0 };
       tl.to(p, {
         t: 1,
@@ -100,7 +110,7 @@ export const bellStage: Stage = {
         onUpdate: () => {
           w.table.position.lerpVectors(START, END, p.t);
           w.table.rotation.y = 0.1 * p.t;
-          sling(w);
+          if (w.hammock) sling(w);
           if (grooves) revealTrail(grooves, p.t);
         },
       });
@@ -109,19 +119,22 @@ export const bellStage: Stage = {
     }
   },
 
-  explain(w, id, tl) {
+  explain(w, id, tl, context) {
     if (id === "hammock") {
       const marge = w.cast.marge.root;
       tl.to(marge.position, { y: 0.62, duration: 0.25, yoyo: true, repeat: 3 });
       ring(tl, w.bell, "<");
     } else {
-      const b = bear();
-      place(b, -6.5, 0, -1.2);
-      w.extras.add(b);
-      walk(tl, b, v(-2.3, 0, 0.4), 1.2);
-      tl.add(() => cue("thud"));
-      tl.to(w.table.position, { x: "+=0.15", duration: 0.12, yoyo: true, repeat: 3 });
-      ring(tl, w.bell, "<");
+      const staged = context?.mode === "test" && w.extras.getObjectByName("reconstruction-bear");
+      const b = staged || bear();
+      if (!staged) {
+        place(b, -6.5, 0, -1.2);
+        w.extras.add(b);
+        walk(tl, b, v(-2.3, 0, 0.4), 1.2);
+        tl.add(() => cue("thud"));
+        tl.to(w.table.position, { x: "+=0.15", duration: 0.12, yoyo: true, repeat: 3 });
+        ring(tl, w.bell, "<");
+      }
       walk(tl, b, v(-6.5, 0, 3), 1.0);
       tl.add(() => {
         b.visible = false;
