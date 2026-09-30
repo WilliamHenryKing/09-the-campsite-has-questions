@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import type { CharacterId } from "../game/types";
 import { type Character, character } from "./characters";
+import type { Hammock } from "./hammock";
 import { C, mat, mesh } from "./palette";
 import {
   bellPost,
@@ -46,7 +47,7 @@ export class World {
     marge: character("marge"),
     pip: character("pip"),
   };
-  private hammockMesh: THREE.Group | null = null;
+  private hammockMesh: Hammock | null = null;
   private persistent: SceneResources;
 
   constructor() {
@@ -99,14 +100,16 @@ export class World {
 
   /** Re-sling the hammock between two points, or remove it. */
   setHammock(a: THREE.Vector3 | null, b?: THREE.Vector3, sag = 0.45) {
-    if (this.hammockMesh) {
+    if (a && b) {
+      if (this.hammockMesh) this.hammockMesh.update(a, b, sag);
+      else {
+        this.hammockMesh = hammock(a, b, sag);
+        this.root.add(this.hammockMesh);
+      }
+    } else if (this.hammockMesh) {
       this.root.remove(this.hammockMesh);
       disposeTree(this.hammockMesh, { preserve: this.persistent });
       this.hammockMesh = null;
-    }
-    if (a && b) {
-      this.hammockMesh = hammock(a, b, sag);
-      this.root.add(this.hammockMesh);
     }
   }
 

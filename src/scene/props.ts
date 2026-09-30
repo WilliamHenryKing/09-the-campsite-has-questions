@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { Hammock } from "./hammock";
 import { C, group, mat, mesh } from "./palette";
 
 // Large set pieces: the island, trees, furniture and fixtures of the campground.
@@ -216,16 +217,6 @@ export function windsock(): THREE.Group {
 }
 
 /** A hammock slung between two world points, sagging in the middle. */
-export function hammock(a: THREE.Vector3, b: THREE.Vector3, sag = 0.45): THREE.Group {
-  const mid = a.clone().lerp(b, 0.5);
-  mid.y -= sag;
-  const curve = new THREE.QuadraticBezierCurve3(a, mid, b);
-  const inner = new THREE.QuadraticBezierCurve3(
-    a.clone().lerp(mid, 0.25),
-    mid,
-    b.clone().lerp(mid, 0.25),
-  );
-  const bed = mesh(new THREE.TubeGeometry(inner, 12, 0.2, 6, false), mat(C.canvas, { flat: true }));
-  const line = mesh(new THREE.TubeGeometry(curve, 16, 0.02, 4, false), mat(C.rope));
-  return group(bed, line);
+export function hammock(a: THREE.Vector3, b: THREE.Vector3, sag = 0.45): Hammock {
+  return new Hammock(a, b, sag);
 }

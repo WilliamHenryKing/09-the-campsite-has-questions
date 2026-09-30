@@ -27,6 +27,10 @@ export class Opening {
   }
 
   update(camera: THREE.PerspectiveCamera, dt: number, reduced: boolean) {
+    if (reduced && this.phase === "glide") {
+      this.phase = "done";
+      this.onDone?.();
+    }
     if (this.phase === "done") {
       if (camera.view?.enabled) camera.clearViewOffset();
       return;

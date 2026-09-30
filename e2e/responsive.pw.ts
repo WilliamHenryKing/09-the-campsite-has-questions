@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { ready } from "./support";
 
 test.describe("touch onboarding on small screens", () => {
   test.use({ hasTouch: true, isMobile: true, reducedMotion: "reduce" });
@@ -11,9 +12,7 @@ test.describe("touch onboarding on small screens", () => {
     }) => {
       await page.setViewportSize(viewport);
       await page.goto("/?e2e&intro");
-      await page.waitForFunction(() => !document.getElementById("arrival"), null, {
-        timeout: 90_000,
-      });
+      await ready(page);
       const begin = page.getByRole("button", { name: "Open the casebook", exact: true });
       await begin.scrollIntoViewIfNeeded();
       await begin.tap();

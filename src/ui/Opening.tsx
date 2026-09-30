@@ -2,9 +2,19 @@ import { useEffect, useRef } from "react";
 import type { CaseDef } from "../game/types";
 import "./opening.css";
 
-export function Title({ def, onBegin }: { def: CaseDef; onBegin: () => void }) {
+export function Title({
+  def,
+  ready = true,
+  onBegin,
+}: {
+  def: CaseDef;
+  ready?: boolean;
+  onBegin: () => void;
+}) {
   const button = useRef<HTMLButtonElement>(null);
-  useEffect(() => button.current?.focus(), []);
+  useEffect(() => {
+    if (ready) button.current?.focus({ preventScroll: true });
+  }, [ready]);
   return (
     <section className="opening" aria-labelledby="opening-title">
       <div className="opening-copy">
@@ -25,7 +35,13 @@ export function Title({ def, onBegin }: { def: CaseDef; onBegin: () => void }) {
           {def.complaint}
         </p>
         <div className="rise">
-          <button ref={button} type="button" className="opening-button" onClick={onBegin}>
+          <button
+            ref={button}
+            type="button"
+            className="opening-button"
+            disabled={!ready}
+            onClick={onBegin}
+          >
             Open the casebook
           </button>
           <span className="enter-note">or press Enter</span>

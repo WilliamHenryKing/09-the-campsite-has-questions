@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { type Ambience, type Sfx, sound } from "../audio/sound";
 import { setCueHandler } from "../scene/cues";
+import { isEditingTarget, suppressRepeatedActivation } from "./keyboard";
 
 /**
  * Starts audio on the first gesture, routes scene cues to effects, follows the case's time
@@ -15,10 +16,10 @@ export function useSoundscape(time: Ambience, ducked: boolean) {
       window.removeEventListener("keydown", unlock);
     };
     const onKey = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement | null)?.tagName;
-      if ((e.key === "m" || e.key === "M") && tag !== "INPUT" && !e.metaKey && !e.ctrlKey) {
-        sound.toggle();
-      }
+      if (e.defaultPrevented) return;
+      if (suppressRepeatedActivation(e, e.target)) e.preventDefault();
+      if (e.repeat || e.metaKey || e.ctrlKey || e.altKey || isEditingTarget(e.target)) return;
+      if (e.key.toLowerCase() === "m") sound.toggle();
     };
     window.addEventListener("pointerdown", unlock);
     window.addEventListener("keydown", unlock);
@@ -27,6 +28,8 @@ export function useSoundscape(time: Ambience, ducked: boolean) {
       window.removeEventListener("pointerdown", unlock);
       window.removeEventListener("keydown", unlock);
       window.removeEventListener("keydown", onKey);
+      setCueHandler(() => {});
+      sound.dispose();
     };
   }, []);
 

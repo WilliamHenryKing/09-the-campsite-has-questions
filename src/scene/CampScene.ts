@@ -51,11 +51,14 @@ export class CampScene {
   private firstFrame: (() => void) | null = null;
   private width = 1;
   private height = 1;
+  private disposed = false;
+  private motion = window.matchMedia("(prefers-reduced-motion: reduce)");
   readonly webgl: boolean;
 
   constructor(
     private canvas: HTMLCanvasElement,
     private reducedMotion: boolean,
+    private onFailure: (error: unknown) => void = () => {},
   ) {
     try {
       this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -69,11 +72,13 @@ export class CampScene {
     }
     this.webgl = this.renderer !== null;
     this.scene.add(this.world.root);
+    canvas.addEventListener("webglcontextlost", this.onContextLost);
     this.resize();
     this.loop();
   }
 
   onFirstFrame(cb: () => void) {
+    if (this.disposed) return;
     this.firstFrame = cb;
     if (!this.renderer) cb();
   }
@@ -86,6 +91,7 @@ export class CampScene {
   }
 
   setCase(def: CaseDef) {
+    if (this.disposed) return;
     this.stop();
     this.stage = STAGES[def.id] ?? picnicStage;
     this.lighting.apply(this.scene, def.time);
@@ -93,18 +99,21 @@ export class CampScene {
   }
 
   showFound() {
+    if (this.disposed) return;
     this.stop();
     this.world.reset();
     this.stage.found(this.world);
   }
 
   inspect(clueId: string | null) {
+    if (this.disposed) return;
     this.inspecting = clueId !== null;
     if (clueId) this.inspector.show(clueId);
   }
 
   /** Drag or key input: turns the sample when inspecting, otherwise orbits the camp a little. */
   turn(dx: number, dy: number) {
+    if (this.disposed) return;
     if (this.inspecting) {
       this.inspector.turn(dx, dy);
       return;
@@ -114,6 +123,7 @@ export class CampScene {
   }
 
   beginReconstruction(context?: ReconstructionContext) {
+    if (this.disposed) return;
     this.stop();
     this.reconstruction = context ?? { mode: "payoff", explanation: null };
     this.world.reset();
@@ -130,17 +140,24 @@ export class CampScene {
 
   /** Point at the evidence that disagrees with the replay. */
   flag(clueId: string) {
+    if (this.disposed) return;
     const at = this.stage.anchors[clueId];
     if (at) this.world.extras.add(pulseRing(at));
   }
 
   snapshot(): string | null {
-    if (!this.renderer) return null;
-    this.renderer.render(this.scene, this.camera);
-    return this.canvas.toDataURL("image/jpeg", 0.82);
+    if (!this.renderer || this.disposed) return null;
+    try {
+      this.renderer.render(this.scene, this.camera);
+      return this.canvas.toDataURL("image/jpeg", 0.82);
+    } catch (error) {
+      this.fail(error);
+      return null;
+    }
   }
 
   resize() {
+    if (this.disposed) return;
     const parent = this.canvas.parentElement;
     this.width = Math.max(1, parent?.clientWidth ?? window.innerWidth);
     this.height = Math.max(1, parent?.clientHeight ?? window.innerHeight);
@@ -156,7 +173,10 @@ export class CampScene {
   }
 
   dispose() {
+    if (this.disposed) return;
+    this.disposed = true;
     cancelAnimationFrame(this.frame);
+    this.canvas.removeEventListener("webglcontextlost", this.onContextLost);
     this.stop();
     this.listeners = [];
     this.firstFrame = null;
@@ -167,6 +187,7 @@ export class CampScene {
   }
 
   private play(build: (tl: gsap.core.Timeline) => void): Promise<void> {
+    if (this.disposed) return Promise.resolve();
     this.stop();
     const tl = gsap.timeline({ paused: true });
     build(tl);
@@ -211,12 +232,38 @@ export class CampScene {
   }
 
   private loop = () => {
+    if (this.disposed) return;
+    try {
+      this.draw();
+    } catch (error) {
+      this.fail(error);
+    }
+  };
+
+  private onContextLost = (event: Event) => {
+    event.preventDefault();
+    this.fail(new Error("The campground graphics context was lost"));
+  };
+
+  private fail(error: unknown) {
+    if (this.disposed) return;
+    // Unmount the UI before continuations of a canceled reconstruction resume.
+    queueMicrotask(() => this.onFailure(error));
+    this.dispose();
+  }
+
+  private draw() {
     this.frame = requestAnimationFrame(this.loop);
+    if (this.motion.matches !== this.reducedMotion) {
+      this.reducedMotion = this.motion.matches;
+      if (this.reducedMotion) this.stop();
+    }
     this.timer.update();
     const dt = Math.min(this.timer.getDelta(), 0.05);
     const t = this.timer.getElapsed();
     this.placeCamera();
     this.opening.update(this.camera, dt, this.reducedMotion);
+    this.camera.updateMatrixWorld();
     if (!this.reducedMotion) {
       for (const c of this.world.extras.children) c.userData.update?.(dt);
     }
@@ -232,7 +279,7 @@ export class CampScene {
       this.firstFrame = null;
       cb();
     }
-  };
+  }
 
   private placeCamera() {
     if (this.camera.fov !== 38) {

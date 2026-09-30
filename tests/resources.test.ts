@@ -56,19 +56,27 @@ describe("scene resource ownership", () => {
     disposeTree(inspector.scene);
   });
 
-  test("a replaced hammock releases geometry while keeping its cached rope material alive", () => {
+  test("a moving hammock reuses geometry and removal releases it while keeping palette material alive", () => {
     const world = new World();
     const a = new THREE.Vector3(0, 1, 0);
     const b = new THREE.Vector3(3, 1, 0);
     world.setHammock(a, b);
-    const old = resourcesOf(world.hammock as THREE.Group);
+    const hammock = world.hammock;
+    if (!hammock) throw new Error("attached hammock");
+    const old = resourcesOf(hammock);
     let geometries = 0;
     let materials = 0;
     for (const geometry of old.geometries) geometry.addEventListener("dispose", () => geometries++);
     for (const material of old.materials) material.addEventListener("dispose", () => materials++);
     world.setHammock(a, b.clone().addScalar(0.5));
+    expect(world.hammock).toBe(hammock);
+    expect(resourcesOf(world.hammock as THREE.Group).geometries).toEqual(old.geometries);
+    expect(geometries).toBe(0);
+    world.setHammock(null);
     expect(geometries).toBe(old.geometries.size);
     expect(materials).toBe(0);
+    world.setHammock(null);
+    expect(geometries).toBe(old.geometries.size);
     disposeTree(world.root);
   });
 

@@ -430,10 +430,9 @@ body {
 }
 
 .stamp-big {
+  display: table;
+  margin: 20px 0 24px auto;
   font-size: 18px;
-  position: absolute;
-  top: 22px;
-  right: 22px;
   transform: rotate(8deg);
   background: #f7f0dfcc;
 }

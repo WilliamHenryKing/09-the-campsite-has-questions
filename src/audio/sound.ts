@@ -78,7 +78,7 @@ function readMuted(): boolean {
   }
 }
 
-class Sound {
+export class Sound {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
   private music: GainNode | null = null;
@@ -89,24 +89,31 @@ class Sound {
   private ambience: Ambience = "afternoon";
   private lastPlayed = new Map<string, number>();
   private listeners = new Set<(muted: boolean) => void>();
+  private pending: AbortController | null = null;
+  private voices = new Map<AudioBufferSourceNode, GainNode>();
+  private stopTimers = new Set<number>();
+  private ducked = false;
   muted = typeof window !== "undefined" ? readMuted() : false;
 
   /** Call from a user gesture: creates the context, then streams in the sounds. */
   unlock() {
-    if (this.ctx || typeof window === "undefined" || !("AudioContext" in window)) return;
-    const ctx = new AudioContext();
+    if (this.ctx) {
+      void this.ctx.resume().catch(() => {});
+      return;
+    }
+    if (typeof window === "undefined" || !("AudioContext" in window)) return;
+    const ctx = new window.AudioContext();
     this.ctx = ctx;
+    this.pending = new AbortController();
     this.master = ctx.createGain();
     this.master.gain.value = this.muted ? 0 : 1;
     this.master.connect(ctx.destination);
-    this.music = this.bus(MUSIC_LEVEL);
+    this.music = this.bus(this.ducked ? MUSIC_LEVEL * 0.4 : MUSIC_LEVEL);
     this.amb = this.bus(1);
     this.sfx = this.bus(0.8);
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) void ctx.suspend();
-      else void ctx.resume();
-    });
-    void this.loadAll();
+    document.addEventListener("visibilitychange", this.onVisibility);
+    void ctx.resume().catch(() => {});
+    void this.loadAll(ctx, this.pending.signal);
   }
 
   onMute(cb: (muted: boolean) => void) {
@@ -147,6 +154,7 @@ class Sound {
     const g = ctx.createGain();
     g.gain.value = opts.volume ?? 1;
     src.connect(g).connect(this.sfx);
+    this.ownVoice(src, g);
     src.start();
   }
 
@@ -158,6 +166,7 @@ class Sound {
 
   /** Lower the music under replays and reports so the scene sounds carry. */
   duck(on: boolean) {
+    this.ducked = on;
     if (!this.ctx || !this.music) return;
     this.music.gain.setTargetAtTime(
       on ? MUSIC_LEVEL * 0.4 : MUSIC_LEVEL,
@@ -174,23 +183,31 @@ class Sound {
     return g;
   }
 
-  private async load(name: string) {
-    if (!this.ctx || this.buffers.has(name)) return;
+  private async load(name: string, ctx: AudioContext, signal: AbortSignal) {
+    if (signal.aborted || this.ctx !== ctx || this.buffers.has(name)) return;
     try {
-      const res = await fetch(`${base}${name}.mp3`);
+      const res = await fetch(`${base}${name}.mp3`, { signal });
+      if (!res.ok) return;
       const data = await res.arrayBuffer();
-      this.buffers.set(name, await this.ctx.decodeAudioData(data));
+      if (signal.aborted || this.ctx !== ctx) return;
+      const buffer = await ctx.decodeAudioData(data);
+      if (!signal.aborted && this.ctx === ctx) this.buffers.set(name, buffer);
     } catch {
       // A missing or undecodable file only silences that one sound.
     }
   }
 
-  private async loadAll() {
+  private async loadAll(ctx: AudioContext, signal: AbortSignal) {
     // Beds first so the camp sounds alive quickly, then effects, then the music.
-    await Promise.all(["amb-birds", "amb-rain", "amb-crickets"].map((n) => this.load(n)));
+    await Promise.all(
+      ["amb-birds", "amb-rain", "amb-crickets"].map((n) => this.load(n, ctx, signal)),
+    );
+    if (signal.aborted || this.ctx !== ctx) return;
     this.applyAmbience();
-    await Promise.all(SFX.map((n) => this.load(`sfx-${n}`)));
-    await this.load("music-cozy");
+    await Promise.all(SFX.map((n) => this.load(`sfx-${n}`, ctx, signal)));
+    if (signal.aborted || this.ctx !== ctx) return;
+    await this.load("music-cozy", ctx, signal);
+    if (signal.aborted || this.ctx !== ctx) return;
     this.startLoop("music-cozy", this.music as GainNode, 1, 2.5);
   }
 
@@ -201,7 +218,11 @@ class Sound {
       if (name.startsWith("amb-") && !wanted.has(name)) {
         loop.gain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.6);
         const src = loop.src;
-        window.setTimeout(() => src.stop(), 3000);
+        const timer = window.setTimeout(() => {
+          this.stopTimers.delete(timer);
+          if (this.voices.has(src)) src.stop();
+        }, 3000);
+        this.stopTimers.add(timer);
         this.loops.delete(name);
       }
     }
@@ -226,8 +247,52 @@ class Sound {
     gain.gain.value = 0;
     gain.gain.setTargetAtTime(level, ctx.currentTime, fadeIn / 3);
     src.connect(gain).connect(bus);
+    this.ownVoice(src, gain);
     src.start(0, src.loopStart);
     this.loops.set(name, { src, gain });
+  }
+
+  private ownVoice(src: AudioBufferSourceNode, gain: GainNode) {
+    this.voices.set(src, gain);
+    src.onended = () => {
+      this.voices.delete(src);
+      src.disconnect();
+      gain.disconnect();
+      src.onended = null;
+    };
+  }
+
+  private onVisibility = () => {
+    const ctx = this.ctx;
+    if (!ctx) return;
+    void (document.hidden ? ctx.suspend() : ctx.resume()).catch(() => {});
+  };
+
+  dispose() {
+    this.pending?.abort();
+    this.pending = null;
+    document.removeEventListener("visibilitychange", this.onVisibility);
+    for (const timer of this.stopTimers) window.clearTimeout(timer);
+    this.stopTimers.clear();
+    for (const [src, gain] of this.voices) {
+      src.onended = null;
+      try {
+        src.stop();
+      } catch {
+        // A voice may already have naturally ended.
+      }
+      src.disconnect();
+      gain.disconnect();
+    }
+    this.voices.clear();
+    this.loops.clear();
+    this.buffers.clear();
+    this.lastPlayed.clear();
+    for (const bus of [this.master, this.music, this.amb, this.sfx]) bus?.disconnect();
+    const ctx = this.ctx;
+    this.ctx = null;
+    this.master = this.music = this.amb = this.sfx = null;
+    if (ctx) void ctx.close().catch(() => {});
   }
 }
 

@@ -28,14 +28,14 @@ interface ReportProps {
 
 /** The illustrated incident report: the payoff for a closed case. */
 export function ReportCard({ def, image, acorns, returned, isLast, onNext }: ReportProps) {
-  const focus = useAutoFocus<HTMLButtonElement>();
+  const focus = useAutoFocus<HTMLHeadingElement>();
   useEffect(() => sound.play("jingle-closed"), []);
   const doubtful = def.statements.filter((s) => s.contradictedBy);
   return (
     <div className="veil">
       <article className="paper report" aria-labelledby="report-title">
         <p className="form-kicker">Incident Report No. {def.number}</p>
-        <h1 id="report-title" className="form-title">
+        <h1 id="report-title" className="form-title" ref={focus} tabIndex={-1} data-keyboard-scroll>
           {def.title}
         </h1>
         <p className="stamp stamp-green stamp-big" aria-hidden="true">
@@ -67,7 +67,7 @@ export function ReportCard({ def, image, acorns, returned, isLast, onNext }: Rep
               : `Returned ${returned}× before acceptance.`}
           </span>
         </div>
-        <button type="button" className="btn btn-primary" onClick={onNext} ref={focus}>
+        <button type="button" className="btn btn-primary" onClick={onNext}>
           {isLast ? "Close the season's log" : "Next incident"}
         </button>
       </article>
@@ -76,14 +76,14 @@ export function ReportCard({ def, image, acorns, returned, isLast, onNext }: Rep
 }
 
 export function Finale({ results, onReplay }: { results: number[]; onReplay: () => void }) {
-  const focus = useAutoFocus<HTMLButtonElement>();
+  const focus = useAutoFocus<HTMLHeadingElement>();
   useEffect(() => sound.play("jingle-finale"), []);
   const total = results.reduce((a, b) => a + b, 0);
   return (
     <div className="veil">
       <article className="paper report" aria-labelledby="finale-title">
         <p className="form-kicker">End of season</p>
-        <h1 id="finale-title" className="form-title">
+        <h1 id="finale-title" className="form-title" ref={focus} tabIndex={-1} data-keyboard-scroll>
           The campsite has no further questions
         </h1>
         <ul className="season">
@@ -102,7 +102,7 @@ export function Finale({ results, onReplay }: { results: number[]; onReplay: () 
             ? "Warden Gus has laminated your reports."
             : "Warden Gus has filed your reports under 'Mostly Correct'."}
         </p>
-        <button type="button" className="btn btn-primary" onClick={onReplay} ref={focus}>
+        <button type="button" className="btn btn-primary" onClick={onReplay}>
           Play again
         </button>
       </article>
