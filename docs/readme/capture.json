@@ -1,0 +1,38 @@
+{
+  "slug": "09-the-campsite-has-questions",
+  "sourceCommit": "d9134466674a4e2be378c80a5dff9c4635009a2e",
+  "url": "https://09-the-campsite-has-questions.williamking.workers.dev",
+  "capturedAt": "2026-10-01T06:18:36.461Z",
+  "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 2060 (0x00001F15) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "errors": [],
+  "desktop": {
+    "width": 1440,
+    "height": 900
+  },
+  "phone": {
+    "width": 390,
+    "height": 844
+  },
+  "frames": 48,
+  "browser": "154.0.8037.58",
+  "assets": [
+    "/assets/index-gWc5Tnjv.js"
+  ],
+  "matchesLocalBuild": true,
+  "phoneOverflow": false,
+  "gifBytes": 1221006,
+  "description": "The current camp tour settling into the investigation and first-case guide",
+  "phoneIsEmulated": true,
+  "loop": {
+    "frames": 48,
+    "delayCentiseconds": 16,
+    "width": 720,
+    "disposal": "None"
+  },
+  "media": [
+    "preview.gif",
+    "desktop.jpg",
+    "detail.jpg",
+    "phone.jpg"
+  ]
+}

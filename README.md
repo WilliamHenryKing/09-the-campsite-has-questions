@@ -1,70 +1,80 @@
-<p align="center"><img src="docs/readme/banner.svg" alt="THE CAMPSITE HAS QUESTIONS: inspect the evidence, hear the campers out, rebuild what happened." width="100%"></p>
+# THE CAMPSITE HAS QUESTIONS
 
-<p align="center">
-  <a href="https://09-the-campsite-has-questions.williamking.workers.dev"><img alt="Play it live" src="https://img.shields.io/badge/Play_it_live-%E2%96%B6-f0a04b?style=for-the-badge&labelColor=14251b"></a>
-  <img alt="Three.js" src="https://img.shields.io/badge/Three.js-f0a04b?style=for-the-badge&logo=threedotjs&logoColor=14251b&labelColor=14251b">
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-f0a04b?style=for-the-badge&logo=typescript&logoColor=14251b&labelColor=14251b">
-  <img alt="React" src="https://img.shields.io/badge/React-f0a04b?style=for-the-badge&logo=react&logoColor=14251b&labelColor=14251b">
-  <img alt="Vite" src="https://img.shields.io/badge/Vite-f0a04b?style=for-the-badge&logo=vite&logoColor=14251b&labelColor=14251b">
-  <img alt="Bun" src="https://img.shields.io/badge/Bun-f0a04b?style=for-the-badge&logo=bun&logoColor=14251b&labelColor=14251b">
-  <img alt="GSAP" src="https://img.shields.io/badge/GSAP-f0a04b?style=for-the-badge&logo=greensock&logoColor=14251b&labelColor=14251b">
-</p>
+<p align="center"><img src="docs/readme/banner.svg" alt="THE CAMPSITE HAS QUESTIONS" width="100%"></p>
 
-**A cosy miniature mystery about physical evidence and unreliable campers.** Something ridiculous has happened at a tiny campground. Inspect the clues, hear the campers out, then test your reconstruction against the scene itself.
+Physical evidence, confident campers and three ridiculous incidents. Inspect a miniature campground, test the witnesses against the clues and reconstruct what really happened. The camp acts out your theory, including the parts the evidence cannot support.
 
-<p align="center"><img src="docs/readme/preview.gif" alt="Inspecting evidence and building the reconstruction on the Incident Board" width="800"></p>
+**[Open the casebook →](https://09-the-campsite-has-questions.williamking.workers.dev)** · [Run locally](#run-locally) · [Credits](#credits)
 
-## How to play
+<p align="center"><img src="docs/readme/preview.gif" alt="The current camp tour settling into the investigation and first-case guide" width="800"></p>
 
-1. **Open the casebook.** A camera tour introduces the camp and the first incident. The optional four-step guide follows your actions; replay it with **?**. Later incidents start with their own form.
-2. **Inspect evidence.** Every clue has a red **?** tag in the scene, so there is no pixel hunting. Pick up a sample and turn it by dragging, with the arrow keys or with the ◀ ▲ ▼ ▶ buttons.
-3. **Talk to the campers.** Tap a name tag to hear a statement. Some witnesses are confident and wrong; once you find the evidence against a statement, it is stamped *doubtful*.
-4. **Open the Incident Board** (button or `B`). Put the three events in order, then choose who did it and why.
-5. **Test against the scene.** The camp replays your version. A beat that contradicts found evidence stops the replay and rings the clue in red; a beat nothing backs up yet shows as unproven.
-6. **File the report.** A wrong report is returned by the Campground Committee and costs an acorn. A correct one plays the official reconstruction and your illustrated report. Close three cases to finish the season.
+## Investigate, then make your case
 
-| Input | Keys and gestures |
+1. **Open the casebook.** The camera introduces the camp; an optional four-step guide follows inspection, evidence, the board and a report. Help can be replayed.
+2. **Inspect marked clues.** Red question tags make evidence discoverable without pixel hunting. Turn a sample by dragging, using arrows or pressing its rotation controls.
+3. **Hear the campers out.** A statement becomes doubtful when you have found the evidence against it. Confidence is not the same as accuracy.
+4. **Build a reconstruction.** On the Incident Board, order three events and choose an actor and explanation.
+5. **Test your theory.** The scene replays the chosen version. Contradictions stop at the relevant beat and mark the clue; unsupported beats stay unproven.
+6. **File the report.** A rejected report costs an acorn. A correct one produces the official reconstruction and illustrated report. Close all three cases to finish the season.
+
+| Action | Input |
 | --- | --- |
-| Look around, turn evidence | Drag, or the arrow keys |
-| Incident Board | `B` |
-| Close a panel | `Esc` |
-| Mute (remembered) | `M` or the corner button |
-| Move between controls | `Tab` |
+| Inspect / speak | Click or tap a clue or name tag |
+| Look around / rotate evidence | Drag or arrow keys |
+| Open Incident Board | B or the Board button |
+| Close a panel | Escape or its close control |
+| Navigate controls | Tab, then Enter or Space |
+| Toggle sound | M or Sound |
 
-## What's inside
+## Three times of day, three fair puzzles
 
-- **Three fair cases:** the picnic in the afternoon, the tent in the rain, the bell at dawn.
-- **A cinematic opening and interactive guide**, with a direct cut for reduced motion.
-- **Deduction by relationship:** one clue orders two events, a second orders another pair, the third decides the explanation. No single clue settles a case.
-- **Proof the puzzles are fair:** unit tests check that exactly one reconstruction survives all three clues.
-- **An animated replay** of your selected theory, stopped by the evidence it contradicts. Unchosen causes do not reveal a culprit.
-- **An illustrated incident report** for every closed case.
-- **Sound for every beat:** a cosy score, per-case ambience (birds, rain, crickets at dawn) and effects that duck under reconstructions.
-- **Accessible by default:** keyboard throughout, and reduced motion jumps straight to each beat's outcome.
+An afternoon picnic, a rain-soaked tent and a dawn bell each supply a different scene, evidence set and ambience. Clues establish relationships between events, so the answer emerges from their combination. The tests check the possible event orders and ensure the complete evidence admits the intended reconstruction.
 
-## Screenshots
+The current replay uses the selected theory rather than revealing an unchosen cause. Repeated reconstructions retain and reset scene geometry, including the hammock, without accumulating replacement buffers. Input and modal focus remain usable on compact portrait and landscape screens; reduced motion jumps to each beat's meaningful outcome.
+
+## Implementation and verification
+
+[src/game/](src/game/) contains cases, deductions and state; [src/scene/](src/scene/) draws evidence and reconstructions; [src/ui/](src/ui/) owns the notebook, board and reports. Audio and scene work are canceled and released when the view is reset or disposed.
+
+Application revision `d913446` passed **64 tests / 1,050 assertions**, seven RTX 2060 scenarios and a final full-season report regression. Coverage includes all cases, replay, repeated reconstructions, three touch sizes, input ownership and startup/runtime recovery. See the [bug-pass report](docs/visual/BUG-PASS-2026-09-30.md).
+
+## Current screenshots
 
 | Desktop | Phone |
 | --- | --- |
-| <img src="docs/readme/desktop.png" alt="The campground and the incident book on desktop" width="560"> | <img src="docs/readme/phone.png" alt="The same case on a phone" width="220"> |
+| <img src="docs/readme/desktop.jpg" alt="THE CAMPSITE HAS QUESTIONS: current desktop opening" width="600"> | <img src="docs/readme/phone.jpg" alt="THE CAMPSITE HAS QUESTIONS: current phone interface" width="240"> |
 
-## Built with
+<img src="docs/readme/detail.jpg" alt="THE CAMPSITE HAS QUESTIONS: the experience after the opening" width="800">
 
-Three.js for the procedural campground, cast and evidence turntable; React and Tailwind CSS for the incident-book interface; GSAP for the replays; TypeScript throughout; Vite and Bun for the build.
+The opening loop and three main screenshots were captured from the live site on **1 October 2026**, using Chrome on this workstation; the phone image is a 390 × 844 browser viewport. The animated preview is a short loop, not a full playthrough. [Capture details](docs/readme/capture.json).
 
-- **Rules first:** the cases, clue relationships and reconstruction evaluation live in pure TypeScript in `src/game/`, tested independently of the scene.
-- **Evidence you can hold:** each clue becomes a small turntable object you can rotate before reading it.
+## Run locally
 
-## Run it locally
+Use **Bun 1.3.10** (the version pinned in `package.json`) and Node.js 22.12 or newer. From this repository:
 
 ```sh
 bun install --frozen-lockfile
 bun run dev      # http://127.0.0.1:4519/
-bun run check    # tsc, Biome, bun test, production build into dist/
-bun run preview  # http://127.0.0.1:4619/
+bun run check    # strict types, Biome, unit tests and production build
+bun run preview  # http://127.0.0.1:4619/ after the build
 ```
 
-`src/game/` holds the rules and case data, `src/scene/` the three.js campground, `src/ui/` the React interface, and `src/loader.ts` the arrival veil.
+Development and preview are separate long-running commands; run one at a time or use separate terminals. `bun run build` writes the static production output to `dist/`. Dependencies and the lockfile are local to this project.
+
+### Browser suite
+
+Install the test browser once, then run the checked-in Playwright suite. Its configuration builds and starts the production preview. Browser scenarios are separate from `bun run check`.
+
+```sh
+bunx playwright install chromium
+bun run e2e
+```
+
+The recorded real-GPU release checks used installed Chrome on an RTX 2060; the default Chromium configuration is not a claim of physical-phone coverage.
+
+## Stack and release
+
+Direct Three.js 0.186 · React 19.3 · strict TypeScript · Vite 8.3 · GSAP 3.15 · Tailwind CSS 4.3 · Bun 1.3.10 · Biome. The public website is served by Cloudflare Workers. This README describes [application revision d913446](https://github.com/WilliamHenryKing/09-the-campsite-has-questions/commit/d9134466674a4e2be378c80a5dff9c4635009a2e); the documentation refresh changes no application behaviour.
 
 ## Credits
 
@@ -74,15 +84,15 @@ Audio, all **CC0 1.0** (credited with thanks, though not required):
 
 | File(s) in `public/audio/` | Source | Author | Licence |
 | --- | --- | --- | --- |
-| `music-cozy.mp3` ("Cozy Puzzle In-Game 1") | https://opengameart.org/content/cozy-puzzle-in-game-1 | MintoDog | CC0 |
-| `amb-birds.mp3` ("Ambient Bird Sounds") | https://opengameart.org/content/ambient-bird-sounds | isaiah658 | CC0 |
-| `amb-rain.mp3` ("Rain (loopable)") | https://opengameart.org/content/rain-loopable | Ylmir | CC0 |
-| `amb-crickets.mp3` ("Crickets Ambient Noise - loopable") | https://opengameart.org/content/crickets-ambient-noise-loopable | Wolfgang_ | CC0 |
-| `sfx-click`, `sfx-turn`, `sfx-talk`, `sfx-tick`, `sfx-select`, `sfx-beat-ok`, `sfx-beat-unproven`, `sfx-contradiction`, `sfx-returned`, `sfx-begin` | Interface Sounds, https://kenney.nl/assets/interface-sounds | Kenney (kenney.nl) | CC0 |
-| `sfx-pickup`, `sfx-board-open`, `sfx-board-close`, `sfx-kettle`, `sfx-creak`, `sfx-book`, `sfx-cloth`, `sfx-peg` | RPG Audio, https://kenney.nl/assets/rpg-audio | Kenney (kenney.nl) | CC0 |
-| `sfx-stamp`, `sfx-bell`, `sfx-step`, `sfx-thud` | Impact Sounds, https://kenney.nl/assets/impact-sounds | Kenney (kenney.nl) | CC0 |
-| `sfx-jingle-closed`, `sfx-jingle-finale` | Music Jingles (Pizzicato), https://kenney.nl/assets/music-jingles | Kenney (kenney.nl) | CC0 |
+| `music-cozy.mp3` ("Cozy Puzzle In-Game 1") | [Source](https://opengameart.org/content/cozy-puzzle-in-game-1) | MintoDog | CC0 |
+| `amb-birds.mp3` ("Ambient Bird Sounds") | [Source](https://opengameart.org/content/ambient-bird-sounds) | isaiah658 | CC0 |
+| `amb-rain.mp3` ("Rain (loopable)") | [Source](https://opengameart.org/content/rain-loopable) | Ylmir | CC0 |
+| `amb-crickets.mp3` ("Crickets Ambient Noise - loopable") | [Source](https://opengameart.org/content/crickets-ambient-noise-loopable) | Wolfgang_ | CC0 |
+| `sfx-click`, `sfx-turn`, `sfx-talk`, `sfx-tick`, `sfx-select`, `sfx-beat-ok`, `sfx-beat-unproven`, `sfx-contradiction`, `sfx-returned`, `sfx-begin` | Interface Sounds, [Source](https://kenney.nl/assets/interface-sounds) | Kenney (kenney.nl) | CC0 |
+| `sfx-pickup`, `sfx-board-open`, `sfx-board-close`, `sfx-kettle`, `sfx-creak`, `sfx-book`, `sfx-cloth`, `sfx-peg` | RPG Audio, [Source](https://kenney.nl/assets/rpg-audio) | Kenney (kenney.nl) | CC0 |
+| `sfx-stamp`, `sfx-bell`, `sfx-step`, `sfx-thud` | Impact Sounds, [Source](https://kenney.nl/assets/impact-sounds) | Kenney (kenney.nl) | CC0 |
+| `sfx-jingle-closed`, `sfx-jingle-finale` | Music Jingles (Pizzicato), [Source](https://kenney.nl/assets/music-jingles) | Kenney (kenney.nl) | CC0 |
 
 ---
 
-<p align="center"><sub>Part of William King's portfolio collection.</sub></p>
+Part of [William King's portfolio collection](https://github.com/WilliamHenryKing).
